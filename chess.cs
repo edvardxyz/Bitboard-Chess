@@ -82,7 +82,7 @@ namespace ChessBitboard{
         public const char wBC = '\u265d';
         public const char wNC = '\u265e';
         public const char wPC = '\u265f';
-        public const char eC = '\u265f';
+        public const char eC = '\u0020';
 
 
         public static void initiateStdChess(){
@@ -143,7 +143,7 @@ namespace ChessBitboard{
                     case bPC:
                         bPB += convertString2Bitboard(binaryString);
                         break;
-                    // white pieces from here
+                        // white pieces from here
                     case wRC:
                         wRB += convertString2Bitboard(binaryString);
                         break;
@@ -164,17 +164,67 @@ namespace ChessBitboard{
                         break;
                 }
             }
-            // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            convertInt2Bits(wNB, "white knight");
+            drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // convertInt2Bits(wNB, "white knight");
         }
 
         public static UInt64 convertString2Bitboard(string binary){
             return Convert.ToUInt64(binary, 2);
         }
 
-        // public static void drawArray(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+        public static void drawArray(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
 
-        // }
+            char[,] chessBoard = new char[8,8];
+            for (int i = 0; i < 64; i++){
+                chessBoard[i/8,i%8] = eC;
+            }
+            for (int i = 0; i < 64; i++){
+                if ((( bKB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = bKC;
+                }
+                if ((( bQB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = bQC;
+                }
+                if ((( bRB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = bRC;
+                }
+                if ((( bBB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = bBC;
+                }
+                if ((( bNB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = bNC;
+                }
+                if ((( bPB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = bPC;
+                }
+                if ((( wKB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = wKC;
+                }
+                if ((( wQB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = wQC;
+                }
+                if ((( wRB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = wRC;
+                }
+                if ((( wBB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = wBC;
+                }
+                if ((( wNB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = wNC;
+                }
+                if ((( wPB >> i ) &1 ) == 1) {
+                    chessBoard[i/8,i%8] = wPC;
+                }
+            }
+            for (int i = 0; i < 8; i++){
+                for (int k = 0; k < 8; k++){
+                    Console.Write($"[{chessBoard[i,k]}]\u2009");
+                if(k == 7) Console.WriteLine();
+                }
+                Console.WriteLine();
+            }
+
+        }
 
         public static void convertInt2Bits(UInt64 decimalNumber, string piece){
             UInt64 remainder;
