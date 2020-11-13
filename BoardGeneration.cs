@@ -39,6 +39,28 @@ namespace ChessBitboard{
 
             char[,] chessBoard = new char[,]
             {
+                // few pawns
+                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
+                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
+                {eC,eC,eC,wPC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,wPC,eC,eC,eC,eC},
+                {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+
+                /*
+                // Black pawns infront of white pawns and white infront of black
+                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
+                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
+                {eC,wPC,eC,wPC,eC,wPC,eC,wPC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {bPC,bPC,eC,bPC,eC,bPC,eC,bPC},
+                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
+                {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+                */
+               /* // Black pawns infront of white pawns
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
@@ -47,14 +69,15 @@ namespace ChessBitboard{
                 {bPC,bPC,eC,bPC,eC,bPC,eC,bPC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-            /*
+            */
+            /* // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,wPC,eC,eC,eC,eC,eC},
+                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
             */
 
@@ -114,18 +137,18 @@ namespace ChessBitboard{
             }
             // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             // drawArray(0, 0, 0,0,0,0,0,0,0,0,0,(~Moves.empty));
-            // string print = Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            // Console.WriteLine($"list:{print}::");
+            string print = Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            Console.WriteLine($":{print}:");
 
 
-            // var sw = System.Diagnostics.Stopwatch.StartNew();
-            // for(int index = 0; index < 10000; index++)
-            // {
-            //     Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            // }
-            // sw.Stop();
-            // var elapsed = sw.ElapsedMilliseconds;
-            // Console.WriteLine(elapsed);
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            for(int index = 0; index < 500000; index++)
+            {
+                Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            }
+            sw.Stop();
+            var elapsed = sw.ElapsedMilliseconds;
+            Console.WriteLine(elapsed);
         }
 
         public static UInt64 convertString2Bitboard(string binary){

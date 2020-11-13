@@ -12,9 +12,8 @@ namespace ChessBitboard{
 
         public static void Main (){
 
-            Console.WriteLine(Moves.trailingZerosLeft(0x100000000000));
-            Console.WriteLine(Moves.trailingZerosRight(0x100000000000));
             BoardGeneration.initiateStdChess();
+
 
             // UInt64 bKingBoard = 0x800000000000000;
             // UInt64 bQueenBoard = 0x1000000000000000;

@@ -47,7 +47,105 @@ namespace ChessBitboard{
             return 0;
         }
 
+
         public static string possiblewP(string hist, UInt64 wPB){
+            string list = "";
+
+            //x1,y1,x2,y2
+            UInt64 pMoves = (wPB>>7) & blackPieces & ~rank8 & ~fileH; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
+            UInt64 possibleMoves=pMoves&~(pMoves-1);
+            while (possibleMoves != 0){
+                int index = trailingZerosRight(possibleMoves);
+                list += "" + (index/8+1) + (index%8-1) + (index/8) + (index%8); //add move cords to list
+                pMoves &= ~(possibleMoves);
+                possibleMoves = pMoves & ~(pMoves-1);
+            }
+
+        /*
+          pMoves = (wPB>>9) & blackPieces & ~rank8 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
+          for (int i=0;i<64;i++){
+          if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+          list+=""+(i/8+1)+(i%8+1)+(i/8)+(i%8); //add move cords to list
+          }
+          }
+
+          pMoves = (wPB>>8) & empty & ~rank8; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
+          for (int i=0;i<64;i++){
+          if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+          list+=""+(i/8+1)+(i%8)+(i/8)+(i%8); //add move cords to list
+          }
+          }
+
+          pMoves = (wPB>>16) & empty & (empty>>8) & rank4; // shift everything to the right by 16 to indicate move forward and field is empty and field infront is empty and it is rank 4(meaning only when rank2 posistion can it move this way)
+          for (int i=0;i<64;i++){
+          if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+          list+=""+(i/8+2)+(i%8)+(i/8)+(i%8); //add move cords to list
+          }
+          }
+        */
+        /*
+        // y1,y2 promotion type, p
+        pMoves = (wPB>>7) & blackPieces & rank8 & ~fileA; // capture right and promote pawn at rank 8
+        for (int i=0;i<64;i++){
+        if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+        list+=""+(i/8-1)+(i%8)+"QP"+(i/8)+(i%8); //add move cords to list
+        }
+        }
+
+        pMoves = (wPB>>8) & empty & rank8; //  move forward and promote
+        for (int i=0;i<64;i++){
+        if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+        list+=""+(i/8+1)+(i%8)+(i/8)+(i%8); //add move cords to list
+        }
+        }
+
+        pMoves = (wPB>>9) & empty & blackPieces & rank8 & ~fileH; // capture left and promote pawn at rank8
+        for (int i=0;i<64;i++){
+        if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+        list+=""+(i/8+2)+(i%8)+(i/8)+(i%8); //add move cords to list
+
+        }
+        }
+        */
+        return list;
+    }
+
+    // public static void possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+
+    // }
+
+
+
+    // public static void newGame(){
+
+
+    //     BoardGeneration.initiateStdChess();
+
+    // }
+
+
+}
+
+}
+
+
+/* Very bad search
+        public static string possiblewPOptimize1(string hist, UInt64 wPB){
+            string list = "";
+
+            //x1,y1,x2,y2
+            UInt64 pMoves = (wPB>>7) & blackPieces & ~rank8 & ~fileH; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
+            for (int i = trailingZerosRight(pMoves); i < 64-trailingZerosLeft(pMoves); i++){
+                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
+                    list+=""+(i/8+1)+(i%8-1)+(i/8)+(i%8); //add move cords to list
+                }
+            }
+            return list;
+        }
+*/
+
+/* Goes through every field on board - seems to not beat current pawn moves method
+        public static string possiblewPnoOptimize(string hist, UInt64 wPB){
             string list = "";
 
             //x1,y1,x2,y2
@@ -57,67 +155,6 @@ namespace ChessBitboard{
                     list+=""+(i/8+1)+(i%8-1)+(i/8)+(i%8); //add move cords to list
                 }
             }
-            pMoves = (wPB>>9) & blackPieces & ~rank8 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
-            for (int i=0;i<64;i++){
-                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-                    list+=""+(i/8+1)+(i%8+1)+(i/8)+(i%8); //add move cords to list
-                }
-            }
-
-            pMoves = (wPB>>8) & empty & ~rank8; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
-            for (int i=0;i<64;i++){
-                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-                    list+=""+(i/8+1)+(i%8)+(i/8)+(i%8); //add move cords to list
-                }
-            }
-
-            pMoves = (wPB>>16) & empty & (empty>>8) & rank4; // shift everything to the right by 16 to indicate move forward and field is empty and field infront is empty and it is rank 4(meaning only when rank2 posistion can it move this way)
-            for (int i=0;i<64;i++){
-                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-                    list+=""+(i/8+2)+(i%8)+(i/8)+(i%8); //add move cords to list
-                }
-            }
-            /*
-            // y1,y2 promotion type, p
-            pMoves = (wPB>>7) & blackPieces & rank8 & ~fileA; // capture right and promote pawn at rank 8
-            for (int i=0;i<64;i++){
-                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-                    list+=""+(i/8-1)+(i%8)+"QP"+(i/8)+(i%8); //add move cords to list
-                }
-            }
-
-            pMoves = (wPB>>8) & empty & rank8; //  move forward and promote
-            for (int i=0;i<64;i++){
-                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-                    list+=""+(i/8+1)+(i%8)+(i/8)+(i%8); //add move cords to list
-                }
-            }
-
-            pMoves = (wPB>>9) & empty & blackPieces & rank8 & ~fileH; // capture left and promote pawn at rank8
-            for (int i=0;i<64;i++){
-                if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-                    list+=""+(i/8+2)+(i%8)+(i/8)+(i%8); //add move cords to list
-
-                }
-            }
-            */
             return list;
         }
-
-            // public static void possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
-
-            // }
-
-
-
-            // public static void newGame(){
-
-
-            //     BoardGeneration.initiateStdChess();
-
-            // }
-
-
-        }
-
-    }
+*/
