@@ -128,27 +128,50 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1);
             }
             // y1, y2 E
-            // TODO: maybe for later test if hist length in var is faster?
+            // DONE: maybe for later test if hist length in var is faster?
+            // hist = "1636";
+            /*
             if (hist.Length >=4) //1636
             { // last digit is equal to 3rd last digit, meaning same file. And that 2nd last digit and 4th last digit are 2 apart
                 if ((hist[hist.Length-1] == hist[hist.Length-3]) && (hist[hist.Length-2] - hist[hist.Length-4] == 2)){
                     int enpassantFile = hist[hist.Length-1] - '0'; // convert last digit in hist - faster convert by subtracting with ascii code // works up to decimal 9 - I need to 7
                     // en passant to the right
-                    pMoves = (wPB << 1) & bPB & rank5 & ~fileA & Filemasks8[enpassantFile]; // piece to move no destination put in hist
-                    possibleMoves = pMoves & ~(pMoves-1);
+                    possibleMoves = (wPB << 1) & bPB & rank5 & ~fileA & Filemasks8[enpassantFile]; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
                     if (possibleMoves != 0){
                         int index = trailingZerosRight(possibleMoves);
                         list += "" + (index%8-1) + (index%8) + " E";
                     }
                     // en passant to the left
-                    pMoves = (wPB >> 1) & bPB & rank5 & ~fileH & Filemasks8[enpassantFile];// piece to move no destination put in hist
-                    possibleMoves = pMoves & ~(pMoves-1);
+                    possibleMoves = (wPB >> 1) & bPB & rank5 & ~fileH & Filemasks8[enpassantFile];// piece to move no destination put in hist
                     if (possibleMoves != 0){
                         int index = trailingZerosRight(possibleMoves);
                         list += "" + (index%8+1) + (index%8) + " E";
                     }
                 }
             }
+*/
+
+            if (hist.Length >=4) //1636
+            { // last digit is equal to 3rd last digit, meaning same file. And that 2nd last digit and 4th last digit are 2 apart
+            int histLen = hist.Length; // trying to replace hist.Length because its called 6 times
+                if ((hist[histLen-1] == hist[histLen-3]) && (hist[histLen-2] - hist[histLen-4] == 2)){
+                    int enpassantFile = hist[histLen-1] - '0'; // convert last digit in hist - faster convert by subtracting with ascii code // works up to decimal 9 - I need to 7
+                    // en passant to the right
+                    possibleMoves = (wPB << 1) & bPB & rank5 & ~fileA & Filemasks8[enpassantFile]; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
+                    if (possibleMoves != 0){
+                        int index = trailingZerosRight(possibleMoves);
+                        list += "" + (index%8-1) + (index%8) + " E";
+                    }
+                    // en passant to the left
+                    possibleMoves = (wPB >> 1) & bPB & rank5 & ~fileH & Filemasks8[enpassantFile];// piece to move no destination put in hist
+                    if (possibleMoves != 0){
+                        int index = trailingZerosRight(possibleMoves);
+                        list += "" + (index%8+1) + (index%8) + " E";
+                    }
+                }
+            }
+
+
             return list;
         }
 

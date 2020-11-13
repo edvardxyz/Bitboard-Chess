@@ -41,12 +41,12 @@ namespace ChessBitboard{
             {
                 // few pawns
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
-                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
-                {eC,eC,eC,wPC,eC,eC,eC,eC},
+                {bPC,bPC,bPC,bPC,bPC,bPC,eC,bPC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,wPC,bPC,eC,eC,wPC,bPC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,wPC,eC,eC,eC,eC},
+                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
 
                 /*
@@ -137,19 +137,20 @@ namespace ChessBitboard{
             }
             // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             // drawArray(0, 0, 0,0,0,0,0,0,0,0,0,(~Moves.empty));
-            // string print = Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            // Console.WriteLine($":{print}:");
+            string print = Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            Console.WriteLine($":{print}:");
             // drawBitboard(Moves.Filemasks8[0]);
 
-
-            // var sw = System.Diagnostics.Stopwatch.StartNew();
-            // for(int index = 0; index < 500000; index++)
-            // {
-            //     Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            // }
-            // sw.Stop();
-            // var elapsed = sw.ElapsedMilliseconds;
-            // Console.WriteLine(elapsed);
+        /*
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            for(int index = 0; index < 50000; index++)
+            {
+                Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            }
+            sw.Stop();
+            var elapsed = sw.ElapsedMilliseconds;
+            Console.WriteLine(elapsed);
+        */
         }
 
         public static UInt64 convertString2Bitboard(string binary){
