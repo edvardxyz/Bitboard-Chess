@@ -44,9 +44,20 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+            /*
+                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
+                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,wPC,eC,eC,eC,eC,eC},
+                {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+            */
+
             };
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
         }
@@ -102,7 +113,10 @@ namespace ChessBitboard{
                 }
             }
             drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            convertInt2Bits((wPB>>9), "white pawns");
+            // drawArray(0, 0, 0,0,0,0,0,0,0,0,0,(~Moves.empty));
+            string print = Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            Console.WriteLine($"list:{print}::");
+
         }
 
         public static UInt64 convertString2Bitboard(string binary){
@@ -176,16 +190,6 @@ namespace ChessBitboard{
             result = result.PadLeft(pad, '0');
             Console.WriteLine(result);
             Console.WriteLine(piece);
-
-            for(int i = 56; i >= 0; i-=8){
-                for(int k = i; k < 64; k++){
-                    Console.Write(result[k]);
-                    if(k==7 || k==15 || k==23 || k==31 || k==39 || k==47 || k==55 || k==63){
-                        Console.Write("\n");
-                        break;
-                    }
-                }
-            }
             Console.Write("\n");
         }
 

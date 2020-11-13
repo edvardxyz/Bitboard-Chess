@@ -10,7 +10,7 @@ namespace ChessBitboard{
 
         // public const string columnLetters = "hgfedcba";
 
-        static void Main (){
+        public static void Main (){
 
             BoardGeneration.initiateStdChess();
 
