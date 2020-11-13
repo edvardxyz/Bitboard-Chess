@@ -44,7 +44,7 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
+                {bPC,bPC,eC,bPC,eC,bPC,eC,bPC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
             /*
@@ -112,11 +112,20 @@ namespace ChessBitboard{
                         break;
                 }
             }
-            drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             // drawArray(0, 0, 0,0,0,0,0,0,0,0,0,(~Moves.empty));
-            string print = Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            Console.WriteLine($"list:{print}::");
+            // string print = Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // Console.WriteLine($"list:{print}::");
 
+
+            // var sw = System.Diagnostics.Stopwatch.StartNew();
+            // for(int index = 0; index < 10000; index++)
+            // {
+            //     Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // }
+            // sw.Stop();
+            // var elapsed = sw.ElapsedMilliseconds;
+            // Console.WriteLine(elapsed);
         }
 
         public static UInt64 convertString2Bitboard(string binary){
@@ -177,20 +186,28 @@ namespace ChessBitboard{
 
         }
 
-        public static void convertInt2Bits(UInt64 decimalNumber, string piece){
-            UInt64 remainder;
-            string result = string.Empty;
-            while (decimalNumber > 0)
-            {
-                remainder = decimalNumber % 2;
-                decimalNumber /= 2;
-                result = remainder.ToString() + result;
+        public static void drawBitboard(UInt64 bitBoard){
+            string[,] chessbit = new string[8,8];
+            for (int i = 0; i<64; i++){
+                chessbit[i/8,i%8]="";
             }
-            int pad = (64 - result.Length) + result.Length;
-            result = result.PadLeft(pad, '0');
-            Console.WriteLine(result);
-            Console.WriteLine(piece);
-            Console.Write("\n");
+            for (int i = 0; i<64; i++){
+                if (((bitBoard>>i)&1)==1){
+                    chessbit[i/8,i%8] = "1";
+                }
+                if ("".Equals(chessbit[i/8,i%8])){
+                    chessbit[i/8,i%8] = " ";
+                }
+
+            }
+            for (int i = 0; i < 8; i++){
+                for (int k = 0; k < 8; k++){
+                    Console.Write($"[{chessbit[i,k]}]\u2009");
+                if(k == 7) Console.WriteLine();
+                }
+                Console.WriteLine();
+            }
+
         }
 
         public static string Reverse( string s ){
