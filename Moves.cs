@@ -61,28 +61,33 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1);
             }
 
-        /*
           pMoves = (wPB>>9) & blackPieces & ~rank8 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
-          for (int i=0;i<64;i++){
-          if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-          list+=""+(i/8+1)+(i%8+1)+(i/8)+(i%8); //add move cords to list
-          }
-          }
+            possibleMoves=pMoves&~(pMoves-1);
+            while (possibleMoves != 0){
+                int index = trailingZerosRight(possibleMoves);
+                list += "" + (index/8+1) + (index%8+1) + (index/8) + (index%8); //add move cords to list
+                pMoves &= ~(possibleMoves);
+                possibleMoves = pMoves & ~(pMoves-1);
+            }
 
           pMoves = (wPB>>8) & empty & ~rank8; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
-          for (int i=0;i<64;i++){
-          if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-          list+=""+(i/8+1)+(i%8)+(i/8)+(i%8); //add move cords to list
-          }
-          }
+            possibleMoves=pMoves&~(pMoves-1);
+            while (possibleMoves != 0){
+                int index = trailingZerosRight(possibleMoves);
+                list += "" + (index/8+1) + (index%8) + (index/8) + (index%8); //add move cords to list
+                pMoves &= ~(possibleMoves);
+                possibleMoves = pMoves & ~(pMoves-1);
+            }
 
           pMoves = (wPB>>16) & empty & (empty>>8) & rank4; // shift everything to the right by 16 to indicate move forward and field is empty and field infront is empty and it is rank 4(meaning only when rank2 posistion can it move this way)
-          for (int i=0;i<64;i++){
-          if (((pMoves>>i)&1)==1){ // search every field on board, every time it finds a bit it adds the position to the list of valid moves
-          list+=""+(i/8+2)+(i%8)+(i/8)+(i%8); //add move cords to list
-          }
-          }
-        */
+            possibleMoves=pMoves&~(pMoves-1);
+            while (possibleMoves != 0){
+                int index = trailingZerosRight(possibleMoves);
+                list += "" + (index/8+2) + (index%8) + (index/8) + (index%8); //add move cords to list
+                pMoves &= ~(possibleMoves);
+                possibleMoves = pMoves & ~(pMoves-1);
+            }
+
         /*
         // y1,y2 promotion type, p
         pMoves = (wPB>>7) & blackPieces & rank8 & ~fileA; // capture right and promote pawn at rank 8
