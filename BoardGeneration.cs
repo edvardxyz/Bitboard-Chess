@@ -40,14 +40,14 @@ namespace ChessBitboard{
             char[,] chessBoard = new char[,]
             {
                 // few pawns
-                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
-                {bPC,bPC,bPC,bPC,bPC,bPC,eC,bPC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,wPC,bPC,eC,eC,wPC,bPC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
-                {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+                {bRC,bNC,bBC,bQC,bKC,bBC,eC,bRC},
+                {bPC,eC,bPC,eC,eC,bPC,eC,bPC},
+                {eC,eC,eC,eC,eC,bNC,eC,eC},
+                {eC,eC,eC,eC,bPC,bPC,eC,eC},
+                {eC,bPC,eC,wPC,wPC,eC,eC,eC},
+                {eC,eC,wPC,eC,wBC,wNC,eC,eC},
+                {wPC,eC,eC,eC,wPC,wPC,wPC,wPC},
+                {wRC,wNC,eC,wQC,wKC,wBC,eC,wRC},
 
                 /*
                 // Black pawns infront of white pawns and white infront of black
@@ -137,20 +137,20 @@ namespace ChessBitboard{
             }
             // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             // drawArray(0, 0, 0,0,0,0,0,0,0,0,0,(~Moves.empty));
-            string print = Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            Console.WriteLine($":{print}:");
-            // drawBitboard(Moves.Filemasks8[0]);
+            // string print = Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // Console.WriteLine($":{print}:");
+            // drawBitboard(0x80);
 
-        /*
+
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            for(int index = 0; index < 50000; index++)
+            for(int index = 0; index < 100000; index++)
             {
                 Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             }
             sw.Stop();
             var elapsed = sw.ElapsedMilliseconds;
             Console.WriteLine(elapsed);
-        */
+
         }
 
         public static UInt64 convertString2Bitboard(string binary){
