@@ -39,6 +39,7 @@ namespace ChessBitboard{
 
             char[,] chessBoard = new char[,]
             {
+                /*
                 // few pawns
                 {bRC,bNC,bBC,bQC,bKC,bBC,eC,bRC},
                 {bPC,eC,bPC,eC,eC,bPC,eC,bPC},
@@ -48,6 +49,7 @@ namespace ChessBitboard{
                 {eC,eC,wPC,eC,wBC,wNC,eC,eC},
                 {wPC,eC,eC,eC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,eC,wQC,wKC,wBC,eC,wRC},
+                */
 
                 /*
                 // Black pawns infront of white pawns and white infront of black
@@ -70,7 +72,7 @@ namespace ChessBitboard{
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
             */
-            /* // NORMAL CHESS
+             // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
@@ -79,7 +81,7 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-            */
+
 
             };
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
@@ -135,13 +137,16 @@ namespace ChessBitboard{
                         break;
                 }
             }
-            // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            // drawArray(0, 0, 0,0,0,0,0,0,0,0,0,(~Moves.empty));
             // string print = Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             // Console.WriteLine($":{print}:");
-            // drawBitboard(0x80);
+            // for(int i = 0; i<8;i++){
+            // drawBitboard(Moves.AntiDiagonalmasks8[i]);
+            // }
+            Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // UInt64 number = 453;
+            // Console.WriteLine(Moves.reverseBit1(number));
 
-
+/*
             var sw = System.Diagnostics.Stopwatch.StartNew();
             for(int index = 0; index < 100000; index++)
             {
@@ -150,7 +155,7 @@ namespace ChessBitboard{
             sw.Stop();
             var elapsed = sw.ElapsedMilliseconds;
             Console.WriteLine(elapsed);
-
+*/
         }
 
         public static UInt64 convertString2Bitboard(string binary){

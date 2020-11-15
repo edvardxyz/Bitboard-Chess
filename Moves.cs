@@ -1,6 +1,15 @@
 // TODO: use stringbuilder instead for the list and hist.
 // strinbuilders do not have indexof and startswith method, might need?
+// stringbuilder is going to be faster
+// TODO: reverse bits faster
 //
+// Algo for sliders
+// ' = reverse: o = occupied: r = rook:
+// lineAttacks = ( o - 2r ) ^ reverse( o'- 2r')
+// o - r removes the piece
+// o -r again borrows from the next peice (attacks) and fills the traversed fields with 1s
+// doing the same but reversing everything makes the slider go right (towards most least significant bit) ( board is from A8 = 1st bit H1 = 64th bit )
+// https://www.chessprogramming.org/Hyperbola_Quintessence
 //
 using System;
 using System.Collections.Generic;
@@ -25,18 +34,72 @@ namespace ChessBitboard{
         public static UInt64 kingSide = 0xF0F0F0F0F0F0F0F;
         public static UInt64 queenSide = 0xF0F0F0F0F0F0F0F0;
         public static UInt64 notWhitePieces; // every piece that white can capture// every black piece except for black king
+        public static UInt64 notBlackPieces; // every piece that white can capture// every black piece except for black king
         public static UInt64 blackPieces; //black pieces except for black king
         public static UInt64 whitePieces; //white pieces except for white king
         public static UInt64 empty; // every field empty
         public static UInt64 occupied;
-        public static UInt64[] Rankmasks8 = new UInt64[] { 0xFF,0xFF00,0xFF0000,0xFF000000,0xFF00000000,0xFF0000000000,0xFF000000000000,0xFF00000000000000};
-        public static UInt64[] Filemasks8 = new UInt64[] { 0x101010101010101,0x202020202020202,0x404040404040404,0x808080808080808,0x1010101010101010,0x2020202020202020,0x4040404040404040,0x8080808080808080};
+        public static UInt64[] Rankmasks8 = new UInt64[]{
+            0xFF,0xFF00,0xFF0000,0xFF000000,0xFF00000000,0xFF0000000000,0xFF000000000000,0xFF00000000000000
+        };
+
+        public static UInt64[] Filemasks8 = new UInt64[]{
+            0x101010101010101,0x202020202020202,0x404040404040404,0x808080808080808,0x1010101010101010,0x2020202020202020,0x4040404040404040,0x8080808080808080
+        };
+
+        public static UInt64[] Diagonalmasks8 = new UInt64[]{
+            0x1, 0x102, 0x10204, 0x1020408, 0x102040810, 0x10204081020, 0x1020408102040,
+            0x102040810204080, 0x204081020408000, 0x408102040800000, 0x810204080000000,
+            0x1020408000000000, 0x2040800000000000, 0x4080000000000000, 0x8000000000000000
+        };
+
+        public static UInt64[] AntiDiagonalmasks8 = new UInt64[]{
+            0x80, 0x8040, 0x804020, 0x80402010, 0x8040201008, 0x804020100804, 0x80402010080402,
+            0x8040201008040201, 0x4020100804020100, 0x2010080402010000, 0x1008040201000000,
+            0x804020100000000, 0x402010000000000, 0x201000000000000, 0x100000000000000
+        };
+
+        public static UInt64 HandVMoves(int square){
+            UInt64 One = 1;
+            UInt64 bitboardSq = One << square;
+            UInt64 revO = reverseBit(occupied);
+            UInt64 revBitSq = reverseBit(bitboardSq);
+            //turn square number into binary bitboard representing piece
+            // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
+            // first part is attack toward MSB (right)
+            UInt64 possibleH = (occupied - (UInt64)2 * bitboardSq) ^ reverseBit(reverseBit(occupied) - (UInt64)2 * reverseBit(bitboardSq));
+            // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
+            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * reverseBit(bitboardSq)));
+            BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
+            BoardGeneration.drawBitboard(revO);
+            BoardGeneration.drawBitboard(bitboardSq);
+            BoardGeneration.drawBitboard(revBitSq);
+            return (possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]); // & with masks and | to combine vertial and horizontal
+        }
+
+        public static UInt64 DandAntiDMoves(int square){
+            UInt64 bitboardSq = (UInt64)1 << square;
+            UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * reverseBit(bitboardSq)));
+            UInt64 possibleAntiD = ((occupied & Diagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * reverseBit(bitboardSq)));
+            return (possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]);
+        }
 
         public static string possibleMovesW(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             notWhitePieces=~(wKB|wQB|wRB|wNB|wBB|wPB|bKB); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
             blackPieces = bQB|bRB|bNB|bBB|bPB; // all the black pieces without king to avoid illegal capture
-            empty = ~(bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB); // indicates empty fields with a 1 with flip ~
+            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+            empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
             string list=possibleWP(hist,wPB,bPB); // add possible white every other piece
+            HandVMoves(36);
+
+            return list;
+        }
+
+        public static string possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+            notBlackPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
+            whitePieces = wQB|wRB|wNB|wBB|wPB; // all the white pieces without king to avoid illegal capture
+            empty = ~(bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB); // indicates empty fields with a 1 with flip ~
+            string list=possibleBP(hist,bPB,wPB); // add possible white every other piece
 
             return list;
         }
@@ -249,13 +312,29 @@ namespace ChessBitboard{
 
 
 
-        // reverse byte order (for 64 bit) dont know how it works
         public static UInt64 reverseBit(UInt64 bitboard)
         {
-            return (bitboard & 0x00000000000000FFUL) << 56 | (bitboard & 0x000000000000FF00UL) << 40 |
-                (bitboard & 0x0000000000FF0000UL) << 24 | (bitboard & 0x00000000FF000000UL) << 8 |
-                (bitboard & 0x000000FF00000000UL) >> 8 | (bitboard & 0x0000FF0000000000UL) >> 24 |
-                (bitboard & 0x00FF000000000000UL) >> 40 | (bitboard & 0xFF00000000000000UL) >> 56;
+            UInt64 reverse = 0;
+            // traverse bits of bitboard from the right
+            do{
+                // left shift 'reverse' by 1
+                reverse <<= 1;
+                // if current bit is 1
+                if ((bitboard & 1) == 1) { reverse ^= 1; }
+                // right shift 'bitboard' by 1
+                bitboard >>= 1;
+            } while (bitboard > 0);
+            return reverse;
+        }
+
+        public static UInt64 reverseBit1(UInt64 bitboard)
+        {
+            var b1 = (bitboard >> 0) & 0xFF;
+            var b2 = (bitboard >> 8) & 0xFF;
+            var b3 = (bitboard >> 16) & 0xFF;
+            var b4 = (bitboard >> 24) & 0xFF;
+
+            return b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0;
         }
 
         // public static void possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
