@@ -29,14 +29,15 @@ namespace ChessBitboard{
         public static UInt64 rank4 = 0xFF00000000;
         public static UInt64 rank5 = 0xFF000000;
         public static UInt64 rank8 = 0xFF;
+        public static UInt64 kingSpan = 0xE0A0E00000000000;
+        public static UInt64 knightSpan = 0xA1100110A;
         public static UInt64 center = 0x1818000000;
         public static UInt64 centerBig = 0x3C3C3C3C0000;
         public static UInt64 kingSide = 0xF0F0F0F0F0F0F0F;
         public static UInt64 queenSide = 0xF0F0F0F0F0F0F0F0;
-        public static UInt64 notWhitePieces; // every piece that white can capture// every black piece except for black king
-        public static UInt64 notBlackPieces; // every piece that white can capture// every black piece except for black king
-        public static UInt64 blackPieces; //black pieces except for black king
-        public static UInt64 whitePieces; //white pieces except for white king
+        public static UInt64 notMyPieces; // every piece that the side can not capture including oppesit side king to stop illegal capture
+        public static UInt64 blackPieces; //black pieces except for black king // used for white pawns
+        public static UInt64 whitePieces; //white pieces except for white king // used for black pawns
         public static UInt64 empty; // every field empty
         public static UInt64 occupied;
         public static UInt64[] Rankmasks8 = new UInt64[]{
@@ -59,25 +60,7 @@ namespace ChessBitboard{
             0x804020100000000, 0x402010000000000, 0x201000000000000, 0x100000000000000
         };
 
-
         public static UInt64 HandVMoves(int square){
-            UInt64 One = 1;
-            UInt64 bitboardSq = One << square;
-            // UInt64 revO = reverseBit(occupied);
-            // UInt64 revBitSq = reverseBit(bitboardSq);
-            //turn square number into binary bitboard representing piece
-            // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
-            // first part is attack toward MSB (right)
-            UInt64 possibleH = (occupied - (UInt64)2 * bitboardSq) ^ reverseBit(reverseBit(occupied) - (UInt64)2 * reverseBit(bitboardSq));
-            // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
-            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * reverseBit(bitboardSq)));
-            // BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
-            // BoardGeneration.drawBitboard(revO);
-            // BoardGeneration.drawBitboard(bitboardSq);
-            // BoardGeneration.drawBitboard(revBitSq);
-            return (possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]); // & with masks and | to combine vertial and horizontal
-        }
-        public static UInt64 HandVMoves1(int square){
             UInt64 One = 1;
             UInt64 bitboardSq = One << square;
             UInt64 revO = reverseBit(occupied);
@@ -85,7 +68,7 @@ namespace ChessBitboard{
             //turn square number into binary bitboard representing piece
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
             // first part is attack toward MSB (right)
-            UInt64 possibleH = (occupied - (UInt64)2 * bitboardSq) ^ reverseBit(revO - (UInt64)2 * revBitSq);
+            UInt64 possibleH = (occupied - 2 * bitboardSq) ^ reverseBit(revO - 2 * revBitSq);
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
             UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * revBitSq));
             // BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
@@ -97,28 +80,36 @@ namespace ChessBitboard{
 
         public static UInt64 DandAntiDMoves(int square){
             UInt64 bitboardSq = (UInt64)1 << square;
-            UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * reverseBit(bitboardSq)));
-            UInt64 possibleAntiD = ((occupied & Diagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * reverseBit(bitboardSq)));
-            BoardGeneration.drawBitboard((possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]));
+            UInt64 revBitSq = reverseBit(bitboardSq);
+            UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * revBitSq));
+            UInt64 possibleAntiD = ((occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * revBitSq));
+            // BoardGeneration.drawBitboard((possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]));
             return (possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]);
         }
 
         public static string possibleMovesW(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
-            notWhitePieces=~(wKB|wQB|wRB|wNB|wBB|wPB|bKB); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
+            notMyPieces=~(wKB|wQB|wRB|wNB|wBB|wPB|bKB); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
             blackPieces = bQB|bRB|bNB|bBB|bPB; // all the black pieces without king to avoid illegal capture
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
             empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
-            string list=possibleWP(hist,wPB,bPB); // add possible white every other piece
-            HandVMoves1(36);
+
+            string list =
+                possibleWP(hist,wPB,bPB) +
+                possibleB(occupied, wBB) +
+                possibleR(occupied, wRB) +
+                possibleQ(occupied, wQB) +
+                possibleN(occupied, wNB) +
+                possibleK(occupied, wKB); // add possible white every other piece
 
             return list;
         }
 
         public static string possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
-            notBlackPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
+            notMyPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
             whitePieces = wQB|wRB|wNB|wBB|wPB; // all the white pieces without king to avoid illegal capture
             empty = ~(bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB); // indicates empty fields with a 1 with flip ~
             string list=possibleBP(hist,bPB,wPB); // add possible white every other piece
+
 
             return list;
         }
@@ -136,6 +127,146 @@ namespace ChessBitboard{
             return 0;
         }
 
+        public static string possibleN(UInt64 occupied, UInt64 N){
+            string list = "";
+            UInt64 i = N & ~(N-1); // get first knight to check for moves
+            UInt64 possible;
+
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+
+                if(iLocation > 18){
+                    possible = knightSpan << (iLocation-18);
+                }else {
+                    possible = knightSpan >> (18-iLocation);
+                }
+
+                if(iLocation % 8<4){
+                    possible = possible & ~fileGH & notMyPieces;
+                }else{
+                    possible = possible & ~fileAB & notMyPieces;
+                }
+                // BoardGeneration.drawBitboard(possible);
+
+                UInt64 k = possible & ~(possible-1); // get one of the possiblities
+                while (k != 0){ // goes trough each of the possibilies
+                    int index = trailingZerosRight(k); // get index of move to
+                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the knight is and index where the knight can move to
+                    possible = possible & ~k; // remove the move from possibiliies that was just listed
+                    k = possible & ~(possible-1); // get the next move possible
+                }
+                N = N & ~i; // remove the knight that was checked for all moves
+                i = N & ~(N-1); // get the next knight to check for all moves
+            }
+            // int temp = list.Length/4;
+            // Console.WriteLine(temp);
+            return list;
+        }
+
+        public static string possibleK(UInt64 occupied, UInt64 K){
+            string list = "";
+            UInt64 i = K & ~(K-1); // get first knight to check for moves
+            UInt64 possible;
+
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+
+                if(iLocation > 54){
+                    possible = kingSpan << (iLocation-54);
+                }else {
+                    possible = kingSpan >> (54-iLocation);
+                }
+
+                if(iLocation % 8 < 4){
+                    possible = possible & ~fileGH & notMyPieces;
+                }else{
+                    possible = possible & ~fileAB & notMyPieces;
+                }
+                // BoardGeneration.drawBitboard(possible);
+
+                UInt64 k = possible & ~(possible-1); // get one of the possiblities
+                while (k != 0){ // goes trough each of the possibilies
+                    int index = trailingZerosRight(k); // get index of move to
+                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the knight is and index where the knight can move to
+                    possible = possible & ~k; // remove the move from possibiliies that was just listed
+                    k = possible & ~(possible-1); // get the next move possible
+                }
+                K = K & ~i; // remove the knight that was checked for all moves
+                i = K & ~(K-1); // get the next knight to check for all moves
+            }
+            // int temp = list.Length/4;
+            // Console.WriteLine(temp);
+            return list;
+        }
+
+        public static string possibleQ(UInt64 occupied, UInt64 Q){
+            string list = "";
+            UInt64 i = Q & ~(Q-1); // get first queen to check for moves
+            UInt64 possible;
+
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of queen
+                possible = (DandAntiDMoves(iLocation) | HandVMoves(iLocation)) & notMyPieces; // get diagonal and antidiagonal moves for the selected piece and with not my pieces
+                UInt64 k = possible & ~(possible-1); // get one of the possiblities
+                while (k != 0){ // goes trough each of the possibilies
+                    int index = trailingZerosRight(k); // get index of move to
+                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the Queen is and index where the Queen can move to
+                    possible = possible & ~k; // remove the move from possibiliies that was just listed
+                    k = possible & ~(possible-1); // get the next move possible
+                }
+                Q = Q & ~i; // remove the Queen that was checked for all moves
+                i = Q & ~(Q-1); // get the next Queen to check for all moves
+            }
+            int temp = list.Length/4;
+            Console.WriteLine(temp);
+            return list;
+        }
+
+        public static string possibleB(UInt64 occupied, UInt64 B){
+            string list = "";
+            UInt64 i = B & ~(B-1); // get first bishop to check for moves
+            UInt64 possible;
+
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of bishop
+                possible = DandAntiDMoves(iLocation)&notMyPieces; // get diagonal and antidiagonal moves for the selected piece and with not my pieces
+                UInt64 k = possible & ~(possible-1); // get one of the possiblities
+                while (k != 0){ // goes trough each of the possibilies
+                    int index = trailingZerosRight(k); // get index of move to
+                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the bishop is and index where the bishop can move to
+                    possible = possible & ~k; // remove the move from possibiliies that was just listed
+                    k = possible & ~(possible-1); // get the next move possible
+                }
+                B = B & ~i; // remove the bishop that was checked for all moves
+                i = B & ~(B-1); // get the next bishop to check for all moves
+            }
+            // int temp = list.Length/4;
+            // Console.WriteLine(temp);
+            return list;
+        }
+
+        public static string possibleR(UInt64 occupied, UInt64 R){
+            string list = "";
+            UInt64 i = R & ~(R-1); // get first rook to check for moves
+            UInt64 possible;
+
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of rook
+                possible = HandVMoves(iLocation)&notMyPieces; // get hori and verti moves for the selected piece and with not my pieces
+                UInt64 k = possible & ~(possible-1); // get one of the possiblities
+                while (k != 0){ // goes trough each of the possibilies
+                    int index = trailingZerosRight(k); // get index of move to
+                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the rook is and index where the rook can move to
+                    possible = possible & ~k; // remove the move from possibiliies that was just listed
+                    k = possible & ~(possible-1); // get the next move possible
+                }
+                R = R & ~i; // remove the rook that was checked for all moves
+                i = R & ~(R-1); // get the next rook to check for all moves
+            }
+            // int temp = list.Length/4;
+            // Console.WriteLine(temp);
+            return list;
+        }
 
         public static string possibleWP(string hist, UInt64 wPB, UInt64 bPB){
             string list = "";
@@ -329,25 +460,16 @@ namespace ChessBitboard{
             return list;
         }
 
+        // almost twice as fast as other method but only for single bit
         public static UInt64 reverseBitSingle(UInt64 bitboard)
         {
-            // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
-            UInt64 reverse = 0;
-            bool found = false;
-            int i;
-            for(i = 0; i < 64; i++){
-                reverse = reverse << 1;
-                if(((bitboard & 1) == 1) && (found == false)){
-                    reverse = reverse ^ 1;
-                    found = true;
-                }
-                bitboard = bitboard >> 1;
-            }
+            UInt64 reverse = 1;
+            int shift = trailingZerosRight(bitboard);
+            reverse = reverse << (63-shift);
             return reverse;
         }
 
-        public static UInt64 reverseBit(UInt64 bitboard)
-        {
+        public static UInt64 reverseBit(UInt64 bitboard){
             // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
             UInt64 reverse = 0;
             for(int i = 0; i < 64; i++){
@@ -359,22 +481,6 @@ namespace ChessBitboard{
             }
             return reverse;
         }
-
-
-        // public static void possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
-
-        // }
-
-
-
-        // public static void newGame(){
-
-
-        //     BoardGeneration.initiateStdChess();
-
-        // }
-
-
     }
 
 }

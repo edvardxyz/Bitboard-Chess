@@ -77,7 +77,7 @@ namespace ChessBitboard{
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,wQC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
@@ -140,22 +140,24 @@ namespace ChessBitboard{
             // string print = Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             // Console.WriteLine($":{print}:");
             // for(int i = 0; i<8;i++){
-            // drawBitboard(Moves.AntiDiagonalmasks8[i]);
+            // drawBitboard(Moves.kingSpan);
             // }
-            Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            Console.Write(Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB).Length/4);
             // UInt64 One = 1;
-            // UInt64 number = One << 32;
+            // UInt64 number = One << 30;
             // Console.WriteLine(number);
+            // Console.WriteLine(Moves.reverseBitSingle(number));
             // Console.WriteLine(Moves.reverseBit(number));
 
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-            for(int index = 0; index < 100000; index++)
-            {
-                Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            }
-            sw.Stop();
-            var elapsed = sw.ElapsedMilliseconds;
-            Console.WriteLine(elapsed);
+        //     var sw = System.Diagnostics.Stopwatch.StartNew();
+        //     for(int index = 0; index < 500000; index++)
+        //     {
+        //      //    Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+        //         Moves.reverseBit(number);
+        //     }
+        //     sw.Stop();
+        //     var elapsed = sw.ElapsedMilliseconds;
+        //     Console.WriteLine(elapsed);
         }
 
         public static UInt64 convertString2Bitboard(string binary){
