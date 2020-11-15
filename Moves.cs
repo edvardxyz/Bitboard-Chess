@@ -100,6 +100,7 @@ namespace ChessBitboard{
                 possibleQ(occupied, wQB) +
                 possibleN(occupied, wNB) +
                 possibleK(occupied, wKB); // add possible white every other piece
+            unsafeBlack(bKB, bQB, bRB, bBB, bNB,  bPB,  wKB,  wQB,  wRB,  wBB,  wNB,  wPB);
 
             return list;
         }
@@ -107,9 +108,16 @@ namespace ChessBitboard{
         public static string possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             notMyPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
             whitePieces = wQB|wRB|wNB|wBB|wPB; // all the white pieces without king to avoid illegal capture
-            empty = ~(bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB); // indicates empty fields with a 1 with flip ~
-            string list=possibleBP(hist,bPB,wPB); // add possible white every other piece
+            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+            empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
 
+            string list =
+                possibleBP(hist,bPB,wPB) +
+                possibleB(occupied, bBB) +
+                possibleR(occupied, bRB) +
+                possibleQ(occupied, bQB) +
+                possibleN(occupied, bNB) +
+                possibleK(occupied, bKB); // concatenate all strings add possible black every piece
 
             return list;
         }
@@ -165,11 +173,9 @@ namespace ChessBitboard{
 
         public static string possibleK(UInt64 occupied, UInt64 K){
             string list = "";
-            UInt64 i = K & ~(K-1); // get first knight to check for moves
             UInt64 possible;
 
-            while(i != 0){
-                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+                int iLocation = trailingZerosRight(K); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
                 if(iLocation > 54){
                     possible = kingSpan << (iLocation-54);
@@ -184,16 +190,13 @@ namespace ChessBitboard{
                 }
                 // BoardGeneration.drawBitboard(possible);
 
-                UInt64 k = possible & ~(possible-1); // get one of the possiblities
-                while (k != 0){ // goes trough each of the possibilies
-                    int index = trailingZerosRight(k); // get index of move to
+                UInt64 i = possible & ~(possible-1); // get one of the possiblities
+                while (i != 0){ // goes trough each of the possibilies
+                    int index = trailingZerosRight(i); // get index of move to
                     list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the knight is and index where the knight can move to
-                    possible = possible & ~k; // remove the move from possibiliies that was just listed
-                    k = possible & ~(possible-1); // get the next move possible
+                    possible = possible & ~i; // remove the move from possibiliies that was just listed
+                    i = possible & ~(possible-1); // get the next move possible
                 }
-                K = K & ~i; // remove the knight that was checked for all moves
-                i = K & ~(K-1); // get the next knight to check for all moves
-            }
             // int temp = list.Length/4;
             // Console.WriteLine(temp);
             return list;
@@ -217,8 +220,8 @@ namespace ChessBitboard{
                 Q = Q & ~i; // remove the Queen that was checked for all moves
                 i = Q & ~(Q-1); // get the next Queen to check for all moves
             }
-            int temp = list.Length/4;
-            Console.WriteLine(temp);
+            // int temp = list.Length/4;
+            // Console.WriteLine(temp);
             return list;
         }
 
@@ -460,6 +463,143 @@ namespace ChessBitboard{
             return list;
         }
 
+        public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+            UInt64 unsafeSq;
+            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+
+            //pawn
+            unsafeSq = ((bPB << 7) & ~fileH); // pawn capture right
+            unsafeSq = unsafeSq | ((bPB << 9) & ~fileA); // pawn capture left
+
+            UInt64 possible;
+            //knight
+            UInt64 i = bNB & ~(bNB-1);
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+
+                if(iLocation > 18){
+                    possible = knightSpan << (iLocation-18);
+                }else {
+                    possible = knightSpan >> (18-iLocation);
+                }
+
+                if(iLocation % 8<4){
+                    possible = possible & ~fileGH;
+                }else{
+                    possible = possible & ~fileAB;
+                }
+                unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
+                bNB = bNB & ~i;
+                i = bNB & ~(bNB-1);
+            }
+            //bishop and queen
+            UInt64 QandB = bQB|bBB;
+            i = QandB & ~(QandB-1);
+            while(i !=0){
+                int iLocation = trailingZerosRight(i);
+                possible = DandAntiDMoves(iLocation);
+                unsafeSq = unsafeSq | possible;
+                QandB = QandB & ~i;
+                i = QandB & ~(QandB-1);
+            }
+            //rook and queen
+            UInt64 QandR = bQB|bRB;
+            i = QandR & ~(QandR-1);
+            while(i !=0){
+                int iLocation = trailingZerosRight(i);
+                possible = HandVMoves(iLocation);
+                unsafeSq = unsafeSq | possible;
+                QandR = QandR & ~i;
+                i = QandR & ~(QandR-1);
+            }
+            //king
+            int kLocation = trailingZerosRight(bKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+
+                if(kLocation > 54){
+                    possible = kingSpan << (kLocation-54);
+                }else {
+                    possible = kingSpan >> (54-kLocation);
+                }
+
+                if(kLocation % 8<4){
+                    possible = possible & ~fileGH;
+                }else{
+                    possible = possible & ~fileAB;
+                }
+                unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
+                BoardGeneration.drawBitboard(unsafeSq);
+                return unsafeSq;
+            }
+
+        public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+            UInt64 unsafeSq;
+            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+
+            //pawn
+            unsafeSq = ((wPB >> 7) & ~fileA); // pawn capture right
+            unsafeSq = unsafeSq | ((wPB >> 9) & ~fileH); // pawn capture left
+
+            UInt64 possible;
+            //knight
+            UInt64 i = wNB & ~(wNB-1);
+            while(i != 0){
+                int iLocation = trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+
+                if(iLocation > 18){
+                    possible = knightSpan << (iLocation-18);
+                }else {
+                    possible = knightSpan >> (18-iLocation);
+                }
+
+                if(iLocation % 8<4){
+                    possible = possible & ~fileGH;
+                }else{
+                    possible = possible & ~fileAB;
+                }
+                unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
+                wNB = wNB & ~i;
+                i = wNB & ~(wNB-1);
+            }
+            //bishop and queen
+            UInt64 QandB = wQB|wBB;
+            i = QandB & ~(QandB-1);
+            while(i !=0){
+                int iLocation = trailingZerosRight(i);
+                possible = DandAntiDMoves(iLocation);
+                unsafeSq = unsafeSq | possible;
+                QandB = QandB & ~i;
+                i = QandB & ~(QandB-1);
+            }
+            //rook and queen
+            UInt64 QandR = wQB|wRB;
+            i = QandR & ~(QandR-1);
+            while(i !=0){
+                int iLocation = trailingZerosRight(i);
+                possible = HandVMoves(iLocation);
+                unsafeSq = unsafeSq | possible;
+                QandR = QandR & ~i;
+                i = QandR & ~(QandR-1);
+            }
+            //king
+            int kLocation = trailingZerosRight(wKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+
+                if(kLocation > 54){
+                    possible = kingSpan << (kLocation-54);
+                }else {
+                    possible = kingSpan >> (54-kLocation);
+                }
+
+                if(kLocation % 8<4){
+                    possible = possible & ~fileGH;
+                }else{
+                    possible = possible & ~fileAB;
+                }
+                unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
+                BoardGeneration.drawBitboard(unsafeSq);
+                return unsafeSq;
+            }
+
+
         // almost twice as fast as other method but only for single bit
         public static UInt64 reverseBitSingle(UInt64 bitboard)
         {
@@ -482,7 +622,6 @@ namespace ChessBitboard{
             return reverse;
         }
     }
-
 }
 
 

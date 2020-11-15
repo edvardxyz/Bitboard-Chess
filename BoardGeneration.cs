@@ -142,13 +142,13 @@ namespace ChessBitboard{
             // for(int i = 0; i<8;i++){
             // drawBitboard(Moves.kingSpan);
             // }
-            Console.Write(Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB).Length/4);
+            // Console.Write(Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB).Length/4);
             // UInt64 One = 1;
             // UInt64 number = One << 30;
             // Console.WriteLine(number);
             // Console.WriteLine(Moves.reverseBitSingle(number));
             // Console.WriteLine(Moves.reverseBit(number));
-
+            Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
         //     var sw = System.Diagnostics.Stopwatch.StartNew();
         //     for(int index = 0; index < 500000; index++)
         //     {
