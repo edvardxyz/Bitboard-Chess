@@ -77,7 +77,7 @@ namespace ChessBitboard{
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,wQC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
@@ -143,19 +143,19 @@ namespace ChessBitboard{
             // drawBitboard(Moves.AntiDiagonalmasks8[i]);
             // }
             Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            // UInt64 number = 453;
-            // Console.WriteLine(Moves.reverseBit1(number));
+            // UInt64 One = 1;
+            // UInt64 number = One << 32;
+            // Console.WriteLine(number);
+            // Console.WriteLine(Moves.reverseBit(number));
 
-/*
             var sw = System.Diagnostics.Stopwatch.StartNew();
             for(int index = 0; index < 100000; index++)
             {
-                Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+                Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             }
             sw.Stop();
             var elapsed = sw.ElapsedMilliseconds;
             Console.WriteLine(elapsed);
-*/
         }
 
         public static UInt64 convertString2Bitboard(string binary){

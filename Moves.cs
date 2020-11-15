@@ -59,7 +59,25 @@ namespace ChessBitboard{
             0x804020100000000, 0x402010000000000, 0x201000000000000, 0x100000000000000
         };
 
+
         public static UInt64 HandVMoves(int square){
+            UInt64 One = 1;
+            UInt64 bitboardSq = One << square;
+            // UInt64 revO = reverseBit(occupied);
+            // UInt64 revBitSq = reverseBit(bitboardSq);
+            //turn square number into binary bitboard representing piece
+            // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
+            // first part is attack toward MSB (right)
+            UInt64 possibleH = (occupied - (UInt64)2 * bitboardSq) ^ reverseBit(reverseBit(occupied) - (UInt64)2 * reverseBit(bitboardSq));
+            // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
+            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * reverseBit(bitboardSq)));
+            // BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
+            // BoardGeneration.drawBitboard(revO);
+            // BoardGeneration.drawBitboard(bitboardSq);
+            // BoardGeneration.drawBitboard(revBitSq);
+            return (possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]); // & with masks and | to combine vertial and horizontal
+        }
+        public static UInt64 HandVMoves1(int square){
             UInt64 One = 1;
             UInt64 bitboardSq = One << square;
             UInt64 revO = reverseBit(occupied);
@@ -67,13 +85,13 @@ namespace ChessBitboard{
             //turn square number into binary bitboard representing piece
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
             // first part is attack toward MSB (right)
-            UInt64 possibleH = (occupied - (UInt64)2 * bitboardSq) ^ reverseBit(reverseBit(occupied) - (UInt64)2 * reverseBit(bitboardSq));
+            UInt64 possibleH = (occupied - (UInt64)2 * bitboardSq) ^ reverseBit(revO - (UInt64)2 * revBitSq);
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
-            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * reverseBit(bitboardSq)));
-            BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
-            BoardGeneration.drawBitboard(revO);
-            BoardGeneration.drawBitboard(bitboardSq);
-            BoardGeneration.drawBitboard(revBitSq);
+            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * revBitSq));
+            // BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
+            // BoardGeneration.drawBitboard(revO);
+            // BoardGeneration.drawBitboard(bitboardSq);
+            // BoardGeneration.drawBitboard(revBitSq);
             return (possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]); // & with masks and | to combine vertial and horizontal
         }
 
@@ -81,6 +99,7 @@ namespace ChessBitboard{
             UInt64 bitboardSq = (UInt64)1 << square;
             UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * reverseBit(bitboardSq)));
             UInt64 possibleAntiD = ((occupied & Diagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * reverseBit(bitboardSq)));
+            BoardGeneration.drawBitboard((possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]));
             return (possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]);
         }
 
@@ -90,7 +109,7 @@ namespace ChessBitboard{
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
             empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
             string list=possibleWP(hist,wPB,bPB); // add possible white every other piece
-            HandVMoves(36);
+            HandVMoves1(36);
 
             return list;
         }
@@ -310,32 +329,37 @@ namespace ChessBitboard{
             return list;
         }
 
-
-
-        public static UInt64 reverseBit(UInt64 bitboard)
+        public static UInt64 reverseBitSingle(UInt64 bitboard)
         {
+            // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
             UInt64 reverse = 0;
-            // traverse bits of bitboard from the right
-            do{
-                // left shift 'reverse' by 1
-                reverse <<= 1;
-                // if current bit is 1
-                if ((bitboard & 1) == 1) { reverse ^= 1; }
-                // right shift 'bitboard' by 1
-                bitboard >>= 1;
-            } while (bitboard > 0);
+            bool found = false;
+            int i;
+            for(i = 0; i < 64; i++){
+                reverse = reverse << 1;
+                if(((bitboard & 1) == 1) && (found == false)){
+                    reverse = reverse ^ 1;
+                    found = true;
+                }
+                bitboard = bitboard >> 1;
+            }
             return reverse;
         }
 
-        public static UInt64 reverseBit1(UInt64 bitboard)
+        public static UInt64 reverseBit(UInt64 bitboard)
         {
-            var b1 = (bitboard >> 0) & 0xFF;
-            var b2 = (bitboard >> 8) & 0xFF;
-            var b3 = (bitboard >> 16) & 0xFF;
-            var b4 = (bitboard >> 24) & 0xFF;
-
-            return b1 << 24 | b2 << 16 | b3 << 8 | b4 << 0;
+            // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
+            UInt64 reverse = 0;
+            for(int i = 0; i < 64; i++){
+                reverse = reverse << 1;
+                if(((bitboard & 1) == 1)){
+                    reverse = reverse ^ 1;
+                }
+                bitboard = bitboard >> 1;
+            }
+            return reverse;
         }
+
 
         // public static void possibleMovesB(string hist, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
 
@@ -383,5 +407,24 @@ namespace ChessBitboard{
    }
    }
    return list;
+
    }
+        public static UInt64 reverseBitShit(UInt64 bitboard)
+        {
+            UInt64 reverse = 0;
+            // traverse bits of bitboard from the right
+            while (bitboard > 0){
+                // left shift 'reverse' by 1
+                reverse <<= 1;
+                Console.WriteLine("hello while loop");
+                // if current bit is 1
+                if ((bitboard & 1) == 1) {
+                    reverse = reverse ^ 1;
+                    Console.WriteLine("hello if statement");
+                }
+                // right shift 'bitboard' by 1
+                bitboard >>= 1;
+            }
+            return reverse;
+        }
 */
