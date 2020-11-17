@@ -74,17 +74,16 @@ namespace ChessBitboard{
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
                */
 
-    /*
                 // Black pawns infront of white pawns
-                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,wQC},
+                {bRC,eC,eC,eC,bKC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {wRC,wNC,wBC,eC,wKC,wBC,wNC,wRC},
-        */
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {wRC,eC,eC,eC,wKC,eC,eC,eC},
+    /*
              // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
@@ -94,6 +93,7 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+        */
 
             };
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
@@ -166,6 +166,10 @@ namespace ChessBitboard{
             //             Console.WriteLine(Perft.move2Algebra(movez.Substring(i, 4)));
             // }
             // Moves.makeMove((ulong)123, "6151", wPC);
+            //
+            Console.WriteLine(Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside).Length/4);
+            Console.WriteLine(Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside));
+            //
         //     var sw = System.Diagnostics.Stopwatch.StartNew();
         //     for(int index = 0; index < 500000; index++)
         //     {
@@ -175,6 +179,8 @@ namespace ChessBitboard{
         //     sw.Stop();
         //     var elapsed = sw.ElapsedMilliseconds;
         //     Console.WriteLine(elapsed);
+
+        /*
          var sw = System.Diagnostics.Stopwatch.StartNew();
             Perft.perftRoot(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside, white2Move, 0);
          sw.Stop();
@@ -182,6 +188,8 @@ namespace ChessBitboard{
          Console.WriteLine($"{elapsed} ms");
              // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             Console.WriteLine(Perft.perftTotalCount);
+            */
+
         }
 
         public static UInt64 convertString2Bitboard(string binary){

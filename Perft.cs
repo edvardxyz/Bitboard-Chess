@@ -25,7 +25,7 @@ namespace ChessBitboard{
 
         public static int perftMoveCount = 0;
         public static int perftTotalCount = 0;
-        static int perftMaxDepth = 4;
+        static int perftMaxDepth = 3; // used 4 for performance comparison
 
         public static void perftRoot(ulong bKB, ulong bQB, ulong bRB, ulong bBB, ulong bNB, ulong bPB, ulong wKB, ulong wQB, ulong wRB, ulong wBB, ulong wNB, ulong wPB, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside, bool white2Move, int depth){
             if (depth < perftMaxDepth){
