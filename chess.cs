@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Text;
+// using System.Threading.Tasks;
 
 namespace ChessBitboard{
 
@@ -12,6 +12,8 @@ namespace ChessBitboard{
 
         public static void Main (){
 
+            // Console.WriteLine(Perft.algebra2Move("e2e3"));
+            // Console.WriteLine(Perft.move2Algebra("6454"));
             BoardGeneration.initiateStdChess();
 
 

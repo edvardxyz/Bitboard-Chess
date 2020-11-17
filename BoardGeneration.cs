@@ -1,12 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+// using System.Collections.Generic;
+// using System.Linq;
+// using System.Text;
+// using System.Threading.Tasks;
 
 namespace ChessBitboard{
     public class BoardGeneration{
 
+        // unicode char for each piece
         public const char bKC = '\u2654';
         public const char bQC = '\u2655';
         public const char bRC = '\u2656';
@@ -21,6 +22,15 @@ namespace ChessBitboard{
         public const char wPC = '\u265f';
         public const char eC = '\u0020';
 
+
+        // king castle check
+        public static bool castleWKside = true;
+        public static bool castleWQside = true;
+        public static bool castleBKside = true;
+        public static bool castleBQside = true;
+
+        public static bool white2Move = true;
+        public static UInt64 EPB = 0;
 
         public static void initiateStdChess(){
             // Initialize array for board
@@ -37,6 +47,8 @@ namespace ChessBitboard{
             UInt64 wNB = 0;
             UInt64 wPB = 0;
 
+
+
             char[,] chessBoard = new char[,]
             {
                 /*
@@ -50,8 +62,7 @@ namespace ChessBitboard{
                 {wPC,eC,eC,eC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,eC,wQC,wKC,wBC,eC,wRC},
                 */
-
-                /*
+/*
                 // Black pawns infront of white pawns and white infront of black
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
@@ -61,17 +72,19 @@ namespace ChessBitboard{
                 {bPC,bPC,eC,bPC,eC,bPC,eC,bPC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-                */
-               /* // Black pawns infront of white pawns
+               */
+
+    /*
+                // Black pawns infront of white pawns
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
-                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,wQC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {bPC,bPC,eC,bPC,eC,bPC,eC,bPC},
-                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
-                {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-            */
+                {wRC,wNC,wBC,eC,wKC,wBC,wNC,wRC},
+        */
              // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
@@ -81,7 +94,6 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-
 
             };
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
@@ -148,7 +160,12 @@ namespace ChessBitboard{
             // Console.WriteLine(number);
             // Console.WriteLine(Moves.reverseBitSingle(number));
             // Console.WriteLine(Moves.reverseBit(number));
-            Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            // Moves.possibleMovesB(ulong bKB, ulong bQB, ulong bRB, ulong bBB, ulong bNB, ulong bPB, ulong wKB, ulong wQB, ulong wRB, ulong wBB, ulong wNB, ulong wPB, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside)
+            // string movez = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
+            // for (int i = 0; i < movez.Length; i+=4){
+            //             Console.WriteLine(Perft.move2Algebra(movez.Substring(i, 4)));
+            // }
+            // Moves.makeMove((ulong)123, "6151", wPC);
         //     var sw = System.Diagnostics.Stopwatch.StartNew();
         //     for(int index = 0; index < 500000; index++)
         //     {
@@ -158,6 +175,13 @@ namespace ChessBitboard{
         //     sw.Stop();
         //     var elapsed = sw.ElapsedMilliseconds;
         //     Console.WriteLine(elapsed);
+         var sw = System.Diagnostics.Stopwatch.StartNew();
+            Perft.perftRoot(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside, white2Move, 0);
+         sw.Stop();
+         var elapsed = sw.ElapsedMilliseconds;
+         Console.WriteLine($"{elapsed} ms");
+             // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            Console.WriteLine(Perft.perftTotalCount);
         }
 
         public static UInt64 convertString2Bitboard(string binary){
