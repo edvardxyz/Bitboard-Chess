@@ -14,7 +14,7 @@
 using System;
 // using System.Collections.Generic;
 // using System.Linq;
-// using System.Text;
+using System.Text;
 // using System.Threading.Tasks;
 // using System.Globalization;
 
@@ -182,6 +182,9 @@ namespace ChessBitboard{
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
             empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
 
+            StringBuilder list = new StringBuilder();
+            list.Append(possibleWP(wPB, bPB, EPB)).Append(possibleB(occupied, wBB)).Append(possibleR(occupied, wRB)).Append(possibleQ(occupied, wQB)).Append(possibleN(occupied, wNB)).Append(possibleK(occupied, wKB)).Append(possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside));
+            /*
             string list =
                 possibleWP(wPB, bPB, EPB) +
                 possibleB(occupied, wBB) +
@@ -190,7 +193,8 @@ namespace ChessBitboard{
                 possibleN(occupied, wNB) +
                 possibleK(occupied, wKB) +
                 possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside); // add possible white every other piece
-            return list;
+            */
+            return list.ToString();
         }
         public static string possibleMovesB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
             notMyPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
@@ -198,6 +202,10 @@ namespace ChessBitboard{
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
             empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
 
+            StringBuilder list = new StringBuilder();
+            list.Append(possibleBP(bPB, wPB, EPB)).Append(possibleB(occupied, bBB)).Append(possibleR(occupied, bRB)).Append(possibleQ(occupied, bQB)).Append(possibleN(occupied, bNB)).Append(possibleK(occupied, bKB)).Append(possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside));
+
+            /*
             string list =
                 possibleBP(bPB, wPB, EPB) +
                 possibleB(occupied, bBB) +
@@ -206,8 +214,9 @@ namespace ChessBitboard{
                 possibleN(occupied, bNB) +
                 possibleK(occupied, bKB) +
                 possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside); // concatenate all strings add possible black every piece
+            */
 
-            return list;
+            return list.ToString();
         }
 
         public static string possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside){
