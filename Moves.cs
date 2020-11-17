@@ -258,7 +258,8 @@ namespace ChessBitboard{
         }
 
         public static string possibleN(UInt64 occupied, UInt64 N){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
             UInt64 i = N & ~(N-1); // get first knight to check for moves
             UInt64 possible;
 
@@ -281,7 +282,7 @@ namespace ChessBitboard{
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
                     int index = Zero.trailingZerosRight(k); // get index of move to
-                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the knight is and index where the knight can move to
+                    list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the knight is and index where the knight can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
                 }
@@ -290,11 +291,12 @@ namespace ChessBitboard{
             }
             // int temp = list.Length/4;
             // Console.WriteLine(temp);
-            return list;
+            return list.ToString();
         }
 
         public static string possibleK(UInt64 occupied, UInt64 K){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
             UInt64 possible;
 
                 int iLocation = Zero.trailingZerosRight(K); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
@@ -315,17 +317,18 @@ namespace ChessBitboard{
                 UInt64 i = possible & ~(possible-1); // get one of the possiblities
                 while (i != 0){ // goes trough each of the possibilies
                     int index = Zero.trailingZerosRight(i); // get index of move to
-                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the knight is and index where the knight can move to
+                    list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the knight is and index where the knight can move to
                     possible = possible & ~i; // remove the move from possibiliies that was just listed
                     i = possible & ~(possible-1); // get the next move possible
                 }
             // int temp = list.Length/4;
             // Console.WriteLine(temp);
-            return list;
+            return list.ToString();
         }
 
         public static string possibleQ(UInt64 occupied, UInt64 Q){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
             UInt64 i = Q & ~(Q-1); // get first queen to check for moves
             UInt64 possible;
 
@@ -335,7 +338,7 @@ namespace ChessBitboard{
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
                     int index = Zero.trailingZerosRight(k); // get index of move to
-                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the Queen is and index where the Queen can move to
+                    list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the Queen is and index where the Queen can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
                 }
@@ -344,11 +347,12 @@ namespace ChessBitboard{
             }
             // int temp = list.Length/4;
             // Console.WriteLine(temp);
-            return list;
+            return list.ToString();
         }
 
         public static string possibleB(UInt64 occupied, UInt64 B){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
             UInt64 i = B & ~(B-1); // get first bishop to check for moves
             UInt64 possible;
 
@@ -358,7 +362,7 @@ namespace ChessBitboard{
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
                     int index = Zero.trailingZerosRight(k); // get index of move to
-                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the bishop is and index where the bishop can move to
+                    list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the bishop is and index where the bishop can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
                 }
@@ -367,11 +371,12 @@ namespace ChessBitboard{
             }
             // int temp = list.Length/4;
             // Console.WriteLine(temp);
-            return list;
+            return list.ToString();
         }
 
         public static string possibleR(UInt64 occupied, UInt64 R){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
             UInt64 i = R & ~(R-1); // get first rook to check for moves
             UInt64 possible;
 
@@ -381,7 +386,7 @@ namespace ChessBitboard{
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
                     int index = Zero.trailingZerosRight(k); // get index of move to
-                    list += "" + (iLocation / 8) + (iLocation % 8) + (index / 8) + (index % 8); // iLocation where the rook is and index where the rook can move to
+                    list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the rook is and index where the rook can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
                 }
@@ -390,11 +395,12 @@ namespace ChessBitboard{
             }
             // int temp = list.Length/4;
             // Console.WriteLine(temp);
-            return list;
+            return list.ToString();
         }
 
         public static string possibleWP(UInt64 wPB, UInt64 bPB, UInt64 EPB){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
 
             //x1,y1,x2,y2
             UInt64 pMoves = (wPB>>7) & blackPieces & ~rank8 & ~fileA; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
@@ -412,7 +418,7 @@ namespace ChessBitboard{
             UInt64 possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
-                list += "" + (index/8+1) + (index%8-1) + (index/8) + (index%8); //add move cords to list // first index +1 to get back to startlocation in the internal rank representation
+                list.Append(index/8+1).Append(index%8-1).Append(index/8).Append(index%8); //add move cords to list // first index +1 to get back to startlocation in the internal rank representation
                 pMoves &= ~(possibleMoves); // the listed move is removed from pMoves
                 possibleMoves = pMoves & ~(pMoves-1); // gets the next move alone in a bitboard
             }
@@ -421,7 +427,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index/8+1) + (index%8+1) + (index/8) + (index%8); //add move cords to list
+                list.Append(index/8+1).Append(index%8+1).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -430,7 +436,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index/8+1) + (index%8) + (index/8) + (index%8); //add move cords to list
+                list.Append(index/8+1).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -439,7 +445,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index/8+2) + (index%8) + (index/8) + (index%8); //add move cords to list
+                list.Append(index/8+2).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -448,7 +454,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index%8-1) + (index%8) + "QP" + (index%8-1) + (index%8) + "RP" + (index%8-1) + (index%8) + "NP" + (index%8-1) + (index%8) + "BP";
+                list.Append(index%8-1).Append(index%8).Append("QP").Append(index%8-1).Append(index%8).Append("RP").Append(index%8-1).Append(index%8).Append("NP").Append(index%8-1).Append(index%8).Append("BP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -457,7 +463,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index%8+1) + (index%8) + "QP" + (index%8+1) + (index%8) + "RP" + (index%8+1) + (index%8) + "NP" + (index%8+1) + (index%8) + "BP";
+                list.Append(index%8+1).Append(index%8).Append("QP").Append(index%8+1).Append(index%8).Append("RP").Append(index%8+1).Append(index%8).Append("NP").Append(index%8+1).Append(index%8).Append("BP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -466,7 +472,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index%8) + (index%8) + "QP" + (index%8) + (index%8) + "RP" + (index%8) + (index%8) + "NP" + (index%8) + (index%8) + "BP";
+                list.Append(index%8).Append(index%8).Append("QP").Append(index%8).Append(index%8).Append("RP").Append(index%8).Append(index%8).Append("NP").Append(index%8).Append(index%8).Append("BP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -475,26 +481,27 @@ namespace ChessBitboard{
                     possibleMoves = (wPB << 1) & bPB & rank5 & ~fileA & EPB; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
                     if (possibleMoves != 0){
                         int index = Zero.trailingZerosRight(possibleMoves);
-                        list += "" + (index%8-1) + (index%8) + "WE";
+                        list.Append(index%8-1).Append(index%8).Append("WE");
                     }
                     // en passant to the left
                     possibleMoves = (wPB >> 1) & bPB & rank5 & ~fileH & EPB;// piece to move no destination put in hist
                     if (possibleMoves != 0){
                         int index = Zero.trailingZerosRight(possibleMoves);
-                        list += "" + (index%8+1) + (index%8) + "WE";
+                        list.Append(index%8+1).Append(index%8).Append("WE");
                     }
-            return list;
+            return list.ToString();
         }
 
         public static string possibleBP(UInt64 bPB, UInt64 wPB, UInt64 EPB){
-            string list = "";
+            // string list = "";
+            StringBuilder list = new StringBuilder();
 
             //x1,y1,x2,y2
             UInt64 pMoves = (bPB<<7) & whitePieces & ~rank1 & ~fileH;// shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             UInt64 possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
-                list += "" + (index/8-1) + (index%8+1) + (index/8) + (index%8); //add move cords to list // first index +1 to get back to startlocation in the internal rank representation
+                list.Append(index/8-1).Append(index%8+1).Append(index/8).Append(index%8); //add move cords to list // first index +1 to get back to startlocation in the internal rank representation
                 pMoves &= ~(possibleMoves); // the listed move is removed from pMoves
                 possibleMoves = pMoves & ~(pMoves-1); // gets the next move alone in a bitboard
             }
@@ -503,7 +510,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index/8-1) + (index%8-1) + (index/8) + (index%8); //add move cords to list
+                list.Append(index/8-1).Append(index%8-1).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -512,7 +519,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index/8-1) + (index%8) + (index/8) + (index%8); //add move cords to list
+                list.Append(index/8-1).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -521,7 +528,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index/8-2) + (index%8) + (index/8) + (index%8); //add move cords to list
+                list.Append(index/8-2).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -530,7 +537,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index%8+1) + (index%8) + "qP" + (index%8+1) + (index%8) + "rP" + (index%8+1) + (index%8) + "nP" + (index%8+1) + (index%8) + "bP";
+                list.Append(index%8+1).Append(index%8).Append("qP").Append(index%8+1).Append(index%8).Append("rP").Append(index%8+1).Append(index%8).Append("nP").Append(index%8+1).Append(index%8).Append("bP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -539,7 +546,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index%8-1) + (index%8) + "qP" + (index%8-1) + (index%8) + "rP" + (index%8-1) + (index%8) + "nP" + (index%8-1) + (index%8) + "bP";
+                list.Append(index%8-1).Append(index%8).Append("qP").Append(index%8-1).Append(index%8).Append("rP").Append(index%8-1).Append(index%8).Append("nP").Append(index%8-1).Append(index%8).Append("bP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -548,7 +555,7 @@ namespace ChessBitboard{
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Zero.trailingZerosRight(possibleMoves);
-                list += "" + (index%8) + (index%8) + "qP" + (index%8) + (index%8) + "rP" + (index%8) + (index%8) + "nP" + (index%8) + (index%8) + "bP";
+                list.Append(index%8).Append(index%8).Append("qP").Append(index%8).Append(index%8).Append("rP").Append(index%8).Append(index%8).Append("nP").Append(index%8).Append(index%8).Append("bP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
             }
@@ -557,15 +564,15 @@ namespace ChessBitboard{
                     possibleMoves = (bPB >> 1) & wPB & rank4 & ~fileH & EPB; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
                     if (possibleMoves != 0){
                         int index = Zero.trailingZerosRight(possibleMoves);
-                        list += "" + (index%8+1) + (index%8) + "BE";
+                        list.Append(index%8+1).Append(index%8).Append("BE");
                     }
                     // en passant to the left
                     possibleMoves = (bPB << 1) & wPB & rank4 & ~fileA & EPB;// piece to move no destination put in hist
                     if (possibleMoves != 0){
                         int index = Zero.trailingZerosRight(possibleMoves);
-                        list += "" + (index%8-1) + (index%8) + "BE";
+                        list.Append(index%8-1).Append(index%8).Append("BE");
                     }
-            return list;
+            return list.ToString();
         }
 
         public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
