@@ -2,7 +2,7 @@ using System;
 
 namespace ChessBitboard{
 
-    public class Zero{
+    public class Tools{
 
         public static int trailingZerosRight(UInt64 move){
                 if (((move)&1)==1) return 0 ;
@@ -70,6 +70,161 @@ namespace ChessBitboard{
                 if (((move >>62)&1)==1) return 62;
                 if (((move >>63)&1)==1) return 63;
             return 64;
+        }
+
+        // 6.3 seconds faster on 5 ply deep search than doing with for loop
+        public static UInt64 reverseBit(UInt64 bitboard){
+            UInt64 reverse = 0;
+                if (((bitboard)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>1 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>2 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>3 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>4 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>5 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>6 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>7 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>8 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>9 )&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>10)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>11)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>12)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>13)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>14)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>15)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>16)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>17)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>18)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>19)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>20)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>21)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>22)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>23)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>24)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>25)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>26)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>27)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>28)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>29)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>30)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>31)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>32)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>33)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>34)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>35)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>36)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>37)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>38)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>39)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>40)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>41)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>42)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>43)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>44)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>45)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>46)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>47)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>48)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>49)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>50)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>51)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>52)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>53)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>54)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>55)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>56)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>57)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>58)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>59)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>60)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>61)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>62)&1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if (((bitboard >>63)&1)==1) { reverse = reverse ^ 1; }
+            return reverse;
+        }
+
+        public static UInt64 reverseBitSingle(UInt64 bitboard){
+        // almost twice as fast as other method but only for single bit
+        // almost 3 seconds faster at perft search depth of 5 almost 10% faster
+            UInt64 reverse = 1;
+            int shift = Tools.trailingZerosRight(bitboard);
+            reverse = reverse << (63-shift);
+            return reverse;
+        }
+
+        public static UInt64 reverseBitx(UInt64 bitboard){
+            // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
+            UInt64 reverse = 0;
+            for(int i = 0; i < 64; i++){
+                reverse = reverse << 1;
+                if(((bitboard & 1) == 1)){
+                    reverse = reverse ^ 1;
+                }
+                bitboard = bitboard >> 1;
+            }
+            return reverse;
         }
 
         public static int trailingZerosLeft(UInt64 move){

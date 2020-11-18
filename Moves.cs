@@ -30,7 +30,7 @@ namespace ChessBitboard{
         public static UInt64 rank4 = 0xFF00000000;
         public static UInt64 rank5 = 0xFF000000;
         public static UInt64 rank8 = 0xFF;
-        public static UInt64 kingSpan = 0xE0A0E00000000000;
+        public static UInt64 kingSpan = 0xE0A0E00;
         public static UInt64 knightSpan = 0xA1100110A;
         public static UInt64 center = 0x1818000000;
         public static UInt64 centerBig = 0x3C3C3C3C0000;
@@ -107,11 +107,11 @@ namespace ChessBitboard{
             }else if(move[3] == 'P'){ // if last char in move string is P its a promotion
                 int start, end;
                 if (char.IsUpper(move[2])){ // if 3 char is upper case then its white promoting a piece
-                    start = Zero.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[6]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
-                    end = Zero.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[7]);
+                    start = Tools.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[6]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
+                    end = Tools.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[7]);
                 }else{
-                    start = Zero.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[1]);
-                    end = Zero.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[0]);
+                    start = Tools.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[1]);
+                    end = Tools.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[0]);
                 }
                 if(type == move[2]) {
                     board = board & ~((UInt64)1 << start); // remove piece from start
@@ -121,12 +121,12 @@ namespace ChessBitboard{
             else if (move[3] == 'E'){ // if last char is E the move is en passant
                 int start, end;
                 if (move[2] == 'W'){ // if 3 char is W then its white en passant
-                    start = Zero.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[4]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
-                    end = Zero.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[5]);
+                    start = Tools.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[4]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
+                    end = Tools.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[5]);
                     board = board & ~((UInt64)1 << (int)(Filemasks8[move[1] - '0'] & Rankmasks8[4])); // remove taken pawn - file is move to and rank is the startering rank which is the rank opponent will be at
                 }else{
-                    start = Zero.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[3]);
-                    end = Zero.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[2]);
+                    start = Tools.trailingZerosRight(Filemasks8[move[0] - '0'] & Rankmasks8[3]);
+                    end = Tools.trailingZerosRight(Filemasks8[move[1] - '0'] & Rankmasks8[2]);
                     board = board & ~((UInt64)1 << (int)(Filemasks8[move[1] - '0'] & Rankmasks8[3])); // remove taken pawn
                 }
                 if (((board >> start) & 1 ) == 1 ){ // if pieceBoard is equal to start location
@@ -137,6 +137,36 @@ namespace ChessBitboard{
                 Console.WriteLine("Invalid move");
             }
             return board;
+        }
+
+        public static UInt64 CastleMove(UInt64 Rook, UInt64 King, string move, char type){
+            int start = (((move[0] - '0') * 8) + (move[1] - '0'));
+            if((((King >> start) & 1) == 1) && (("0402" == move) || ("0406" == move) || ("7472" == move) || ("7476" == move))){
+                if(type == 'R'){
+                    switch(move){
+                        case "7472":
+                            Rook = Rook & ~((UInt64)1 << 56); // remove piece from start
+                            Rook = Rook | ((UInt64)1 << 59); // add the piece to d1 sq
+                            break;
+                        case "7476":
+                            Rook = Rook & ~((UInt64)1 << 63); // remove piece from start
+                            Rook = Rook | ((UInt64)1 << 61); // add the piece to f1 sq
+                            break;
+                    }
+                } else if (type == 'r') {
+                    switch(move){
+                        case "0402":
+                            Rook = Rook & ~((UInt64)1); // remove piece from start
+                            Rook = Rook | ((UInt64)1 << 3); // add the piece to f8 sq
+                            break;
+                        case "0406":
+                            Rook = Rook & ~((UInt64)1 << 7); // remove piece from start
+                            Rook = Rook | ((UInt64)1 << 5); // add the piece to d1 sq
+                            break;
+                    }
+                }
+            }
+            return Rook;
         }
 
         public static UInt64 makeMoveEP(UInt64 board, string move){
@@ -150,29 +180,23 @@ namespace ChessBitboard{
         }
 
         public static UInt64 HandVMoves(int square){
-            UInt64 One = 1;
-            UInt64 bitboardSq = One << square;
-            UInt64 revO = reverseBit(occupied);
-            UInt64 revBitSq = reverseBitSingle(bitboardSq);
+            UInt64 bitboardSq = (UInt64)1 << square;
+            UInt64 revO = Tools.reverseBit(occupied);
+            UInt64 revBitSq = Tools.reverseBitSingle(bitboardSq);
             //turn square number into binary bitboard representing piece
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
             // first part is attack toward MSB (right)
-            UInt64 possibleH = (occupied - 2 * bitboardSq) ^ reverseBit(revO - 2 * revBitSq);
+            UInt64 possibleH = (occupied - 2 * bitboardSq) ^ Tools.reverseBit(revO - 2 * revBitSq);
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
-            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Filemasks8[square % 8]) - (2 * revBitSq));
-            // BoardGeneration.drawBitboard((possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]));
-            // BoardGeneration.drawBitboard(revO);
-            // BoardGeneration.drawBitboard(bitboardSq);
-            // BoardGeneration.drawBitboard(revBitSq);
+            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & Filemasks8[square % 8]) - (2 * revBitSq));
             return (possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]); // & with masks and | to combine vertial and horizontal
         }
 
         public static UInt64 DandAntiDMoves(int square){
             UInt64 bitboardSq = (UInt64)1 << square;
-            UInt64 revBitSq = reverseBitSingle(bitboardSq);
-            UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * revBitSq));
-            UInt64 possibleAntiD = ((occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ reverseBit(reverseBit(occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * revBitSq));
-            // BoardGeneration.drawBitboard((possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]));
+            UInt64 revBitSq = Tools.reverseBitSingle(bitboardSq);
+            UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * revBitSq));
+            UInt64 possibleAntiD = ((occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * revBitSq));
             return (possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]);
         }
 
@@ -264,7 +288,7 @@ namespace ChessBitboard{
             UInt64 possible;
 
             while(i != 0){
-                int iLocation = Zero.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
                 if(iLocation > 18){
                     possible = knightSpan << (iLocation-18);
@@ -281,7 +305,7 @@ namespace ChessBitboard{
 
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
-                    int index = Zero.trailingZerosRight(k); // get index of move to
+                    int index = Tools.trailingZerosRight(k); // get index of move to
                     list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the knight is and index where the knight can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
@@ -299,12 +323,12 @@ namespace ChessBitboard{
             StringBuilder list = new StringBuilder();
             UInt64 possible;
 
-                int iLocation = Zero.trailingZerosRight(K); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+                int iLocation = Tools.trailingZerosRight(K); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
-                if(iLocation > 54){
-                    possible = kingSpan << (iLocation-54);
+                if(iLocation > 18){
+                    possible = kingSpan << (iLocation-18);
                 }else {
-                    possible = kingSpan >> (54-iLocation);
+                    possible = kingSpan >> (18-iLocation);
                 }
 
                 if(iLocation % 8 < 4){
@@ -316,7 +340,7 @@ namespace ChessBitboard{
 
                 UInt64 i = possible & ~(possible-1); // get one of the possiblities
                 while (i != 0){ // goes trough each of the possibilies
-                    int index = Zero.trailingZerosRight(i); // get index of move to
+                    int index = Tools.trailingZerosRight(i); // get index of move to
                     list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the knight is and index where the knight can move to
                     possible = possible & ~i; // remove the move from possibiliies that was just listed
                     i = possible & ~(possible-1); // get the next move possible
@@ -333,11 +357,11 @@ namespace ChessBitboard{
             UInt64 possible;
 
             while(i != 0){
-                int iLocation = Zero.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of queen
+                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of queen
                 possible = (DandAntiDMoves(iLocation) | HandVMoves(iLocation)) & notMyPieces; // get diagonal and antidiagonal moves for the selected piece and with not my pieces
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
-                    int index = Zero.trailingZerosRight(k); // get index of move to
+                    int index = Tools.trailingZerosRight(k); // get index of move to
                     list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the Queen is and index where the Queen can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
@@ -357,11 +381,11 @@ namespace ChessBitboard{
             UInt64 possible;
 
             while(i != 0){
-                int iLocation = Zero.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of bishop
+                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of bishop
                 possible = DandAntiDMoves(iLocation)&notMyPieces; // get diagonal and antidiagonal moves for the selected piece and with not my pieces
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
-                    int index = Zero.trailingZerosRight(k); // get index of move to
+                    int index = Tools.trailingZerosRight(k); // get index of move to
                     list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the bishop is and index where the bishop can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
@@ -381,11 +405,11 @@ namespace ChessBitboard{
             UInt64 possible;
 
             while(i != 0){
-                int iLocation = Zero.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of rook
+                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of rook
                 possible = HandVMoves(iLocation)&notMyPieces; // get hori and verti moves for the selected piece and with not my pieces
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
-                    int index = Zero.trailingZerosRight(k); // get index of move to
+                    int index = Tools.trailingZerosRight(k); // get index of move to
                     list.Append(iLocation / 8).Append(iLocation % 8).Append(index / 8).Append(index % 8); // iLocation where the rook is and index where the rook can move to
                     possible = possible & ~k; // remove the move from possibiliies that was just listed
                     k = possible & ~(possible-1); // get the next move possible
@@ -417,7 +441,7 @@ namespace ChessBitboard{
              *        */
             UInt64 possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
+                int index = Tools.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
                 list.Append(index/8+1).Append(index%8-1).Append(index/8).Append(index%8); //add move cords to list // first index +1 to get back to startlocation in the internal rank representation
                 pMoves &= ~(possibleMoves); // the listed move is removed from pMoves
                 possibleMoves = pMoves & ~(pMoves-1); // gets the next move alone in a bitboard
@@ -426,7 +450,7 @@ namespace ChessBitboard{
             pMoves = (wPB>>9) & blackPieces & ~rank8 & ~fileH; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index/8+1).Append(index%8+1).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -435,7 +459,7 @@ namespace ChessBitboard{
             pMoves = (wPB>>8) & empty & ~rank8; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index/8+1).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -444,7 +468,7 @@ namespace ChessBitboard{
             pMoves = (wPB>>16) & empty & (empty>>8) & rank4; // shift everything to the right by 16 to indicate move forward and field is empty and field infront is empty and it is rank 4(meaning only when rank2 posistion can it move this way)
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index/8+2).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -453,7 +477,7 @@ namespace ChessBitboard{
             pMoves = (wPB>>7) & blackPieces & rank8 & ~fileA; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index%8-1).Append(index%8).Append("QP").Append(index%8-1).Append(index%8).Append("RP").Append(index%8-1).Append(index%8).Append("NP").Append(index%8-1).Append(index%8).Append("BP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -462,7 +486,7 @@ namespace ChessBitboard{
             pMoves = (wPB>>9) & blackPieces & rank8 & ~fileH; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index%8+1).Append(index%8).Append("QP").Append(index%8+1).Append(index%8).Append("RP").Append(index%8+1).Append(index%8).Append("NP").Append(index%8+1).Append(index%8).Append("BP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -471,7 +495,7 @@ namespace ChessBitboard{
             pMoves = (wPB>>8) & empty & rank8; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index%8).Append(index%8).Append("QP").Append(index%8).Append(index%8).Append("RP").Append(index%8).Append(index%8).Append("NP").Append(index%8).Append(index%8).Append("BP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -480,13 +504,13 @@ namespace ChessBitboard{
                     // en passant to the right
                     possibleMoves = (wPB << 1) & bPB & rank5 & ~fileA & EPB; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
                     if (possibleMoves != 0){
-                        int index = Zero.trailingZerosRight(possibleMoves);
+                        int index = Tools.trailingZerosRight(possibleMoves);
                         list.Append(index%8-1).Append(index%8).Append("WE");
                     }
                     // en passant to the left
                     possibleMoves = (wPB >> 1) & bPB & rank5 & ~fileH & EPB;// piece to move no destination put in hist
                     if (possibleMoves != 0){
-                        int index = Zero.trailingZerosRight(possibleMoves);
+                        int index = Tools.trailingZerosRight(possibleMoves);
                         list.Append(index%8+1).Append(index%8).Append("WE");
                     }
             return list.ToString();
@@ -500,7 +524,7 @@ namespace ChessBitboard{
             UInt64 pMoves = (bPB<<7) & whitePieces & ~rank1 & ~fileH;// shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             UInt64 possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
+                int index = Tools.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
                 list.Append(index/8-1).Append(index%8+1).Append(index/8).Append(index%8); //add move cords to list // first index +1 to get back to startlocation in the internal rank representation
                 pMoves &= ~(possibleMoves); // the listed move is removed from pMoves
                 possibleMoves = pMoves & ~(pMoves-1); // gets the next move alone in a bitboard
@@ -509,7 +533,7 @@ namespace ChessBitboard{
             pMoves = (bPB<<9) & whitePieces & ~rank1 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index/8-1).Append(index%8-1).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -518,7 +542,7 @@ namespace ChessBitboard{
             pMoves = (bPB<<8) & empty & ~rank1; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index/8-1).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -527,7 +551,7 @@ namespace ChessBitboard{
             pMoves = (bPB<<16) & empty & (empty<<8) & rank5; // shift everything to the right by 16 to indicate move forward and field is empty and field infront is empty and it is rank 4(meaning only when rank2 posistion can it move this way)
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index/8-2).Append(index%8).Append(index/8).Append(index%8); //add move cords to list
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -536,7 +560,7 @@ namespace ChessBitboard{
             pMoves = (bPB<<7) & whitePieces & rank1 & ~fileH; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index%8+1).Append(index%8).Append("qP").Append(index%8+1).Append(index%8).Append("rP").Append(index%8+1).Append(index%8).Append("nP").Append(index%8+1).Append(index%8).Append("bP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -545,7 +569,7 @@ namespace ChessBitboard{
             pMoves = (bPB<<9) & whitePieces & rank1 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index%8-1).Append(index%8).Append("qP").Append(index%8-1).Append(index%8).Append("rP").Append(index%8-1).Append(index%8).Append("nP").Append(index%8-1).Append(index%8).Append("bP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -554,7 +578,7 @@ namespace ChessBitboard{
             pMoves = (bPB<<8) & empty & rank1; // shift everything to the right by 8 to indicate move forward by one, and there is empty field and not on rank8
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
-                int index = Zero.trailingZerosRight(possibleMoves);
+                int index = Tools.trailingZerosRight(possibleMoves);
                 list.Append(index%8).Append(index%8).Append("qP").Append(index%8).Append(index%8).Append("rP").Append(index%8).Append(index%8).Append("nP").Append(index%8).Append(index%8).Append("bP");
                 pMoves &= ~(possibleMoves);
                 possibleMoves = pMoves & ~(pMoves-1);
@@ -563,13 +587,13 @@ namespace ChessBitboard{
                     // en passant to the right
                     possibleMoves = (bPB >> 1) & wPB & rank4 & ~fileH & EPB; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
                     if (possibleMoves != 0){
-                        int index = Zero.trailingZerosRight(possibleMoves);
+                        int index = Tools.trailingZerosRight(possibleMoves);
                         list.Append(index%8+1).Append(index%8).Append("BE");
                     }
                     // en passant to the left
                     possibleMoves = (bPB << 1) & wPB & rank4 & ~fileA & EPB;// piece to move no destination put in hist
                     if (possibleMoves != 0){
-                        int index = Zero.trailingZerosRight(possibleMoves);
+                        int index = Tools.trailingZerosRight(possibleMoves);
                         list.Append(index%8-1).Append(index%8).Append("BE");
                     }
             return list.ToString();
@@ -587,7 +611,7 @@ namespace ChessBitboard{
             //knight
             UInt64 i = bNB & ~(bNB-1);
             while(i != 0){
-                int iLocation = Zero.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
                 if(iLocation > 18){
                     possible = knightSpan << (iLocation-18);
@@ -608,7 +632,7 @@ namespace ChessBitboard{
             UInt64 QandB = bQB|bBB;
             i = QandB & ~(QandB-1);
             while(i !=0){
-                int iLocation = Zero.trailingZerosRight(i);
+                int iLocation = Tools.trailingZerosRight(i);
                 possible = DandAntiDMoves(iLocation);
                 unsafeSq = unsafeSq | possible;
                 QandB = QandB & ~i;
@@ -618,14 +642,14 @@ namespace ChessBitboard{
             UInt64 QandR = bQB|bRB;
             i = QandR & ~(QandR-1);
             while(i !=0){
-                int iLocation = Zero.trailingZerosRight(i);
+                int iLocation = Tools.trailingZerosRight(i);
                 possible = HandVMoves(iLocation);
                 unsafeSq = unsafeSq | possible;
                 QandR = QandR & ~i;
                 i = QandR & ~(QandR-1);
             }
             //king
-            int kLocation = Zero.trailingZerosRight(bKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+            int kLocation = Tools.trailingZerosRight(bKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
                 if(kLocation > 54){
                     possible = kingSpan << (kLocation-54);
@@ -654,7 +678,7 @@ namespace ChessBitboard{
             //knight
             UInt64 i = wNB & ~(wNB-1);
             while(i != 0){
-                int iLocation = Zero.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
                 if(iLocation > 18){
                     possible = knightSpan << (iLocation-18);
@@ -675,7 +699,7 @@ namespace ChessBitboard{
             UInt64 QandB = wQB|wBB;
             i = QandB & ~(QandB-1);
             while(i !=0){
-                int iLocation = Zero.trailingZerosRight(i);
+                int iLocation = Tools.trailingZerosRight(i);
                 possible = DandAntiDMoves(iLocation);
                 unsafeSq = unsafeSq | possible;
                 QandB = QandB & ~i;
@@ -685,14 +709,14 @@ namespace ChessBitboard{
             UInt64 QandR = wQB|wRB;
             i = QandR & ~(QandR-1);
             while(i !=0){
-                int iLocation = Zero.trailingZerosRight(i);
+                int iLocation = Tools.trailingZerosRight(i);
                 possible = HandVMoves(iLocation);
                 unsafeSq = unsafeSq | possible;
                 QandR = QandR & ~i;
                 i = QandR & ~(QandR-1);
             }
             //king
-            int kLocation = Zero.trailingZerosRight(wKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+            int kLocation = Tools.trailingZerosRight(wKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
                 if(kLocation > 54){
                     possible = kingSpan << (kLocation-54);
@@ -709,27 +733,6 @@ namespace ChessBitboard{
                 return unsafeSq;
             }
 
-        public static UInt64 reverseBitSingle(UInt64 bitboard){
-        // almost twice as fast as other method but only for single bit
-        // almost 3 seconds faster at perft search depth of 5 almost 10% faster
-            UInt64 reverse = 1;
-            int shift = Zero.trailingZerosRight(bitboard);
-            reverse = reverse << (63-shift);
-            return reverse;
-        }
-
-        public static UInt64 reverseBit(UInt64 bitboard){
-            // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
-            UInt64 reverse = 0;
-            for(int i = 0; i < 64; i++){
-                reverse = reverse << 1;
-                if(((bitboard & 1) == 1)){
-                    reverse = reverse ^ 1;
-                }
-                bitboard = bitboard >> 1;
-            }
-            return reverse;
-        }
     }
 }
 

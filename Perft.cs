@@ -34,10 +34,10 @@ namespace ChessBitboard{
                     moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
                 }else{
                     moves = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
-            //         for (int i = 0; i < moves.Length; i+=4){
-            //             Console.WriteLine(move2Algebra(moves.Substring(i, 4)));
-            // }
-            //             Console.ReadKey();
+                    //         for (int i = 0; i < moves.Length; i+=4){
+                    //             Console.WriteLine(move2Algebra(moves.Substring(i, 4)));
+                    // }
+                    //             Console.ReadKey();
                 }
                 for (int i = 0; i < moves.Length; i+=4){
                     UInt64 bRBt = Moves.makeMove(bRB, moves.Substring(i, 4), 'r'),
@@ -53,6 +53,8 @@ namespace ChessBitboard{
                         wNBt = Moves.makeMove(wNB, moves.Substring(i, 4), 'N'),
                         wPBt = Moves.makeMove(wPB, moves.Substring(i, 4), 'P'),
                         EPBt = Moves.makeMoveEP(wPB|bPB, moves.Substring(i, 4));
+                    // wRBt = Moves.CastleMove(wRBt, wKB|bKB, moves.Substring(i, 4), 'R');
+                    // wRBt = Moves.CastleMove(bRBt, bKB|wKB, moves.Substring(i, 4), 'r');
                     // BoardGeneration.drawBitboard(bRBt);
                     // BoardGeneration.drawBitboard(wQBt);
                     // Console.ReadKey();
@@ -100,6 +102,8 @@ namespace ChessBitboard{
                         wNBt = Moves.makeMove(wNB, moves.Substring(i, 4), 'N'),
                         wPBt = Moves.makeMove(wPB, moves.Substring(i, 4), 'P'),
                         EPBt = Moves.makeMoveEP(wPB|bPB, moves.Substring(i, 4));
+                   // wRBt = Moves.CastleMove(wRBt, wKB, moves.Substring(i, 4), 'R');
+                   // wRBt = Moves.CastleMove(bRBt, bKB, moves.Substring(i, 4), 'r');
                     bool castleWKsideT = castleWKside, castleWQsideT = castleWQside, castleBKsideT = castleBKside, castleBQsideT = castleBQside;
                     if(char.IsDigit(moves[i+3])){ // regular move if its a digit at last char - so not P or E
                         int start = (((moves[i] - '0') * 8) + (moves[i+1] - '0')); // set start location for each iteration of i
