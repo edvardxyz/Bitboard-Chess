@@ -205,6 +205,14 @@ namespace ChessBitboard{
             return reverse;
         }
 
+        public static char[] CharCombine(char c0, char c1, char c2, char c3){
+            char[] c = new char[4];
+            c[0] = c0;
+            c[1] = c1;
+            c[2] = c2;
+            c[3] = c3;
+            return c;
+        }
         public static UInt64 reverseBitSingle(UInt64 bitboard){
         // almost twice as fast as other method but only for single bit
         // almost 3 seconds faster at perft search depth of 5 almost 10% faster
