@@ -30,6 +30,7 @@ namespace ChessBitboard{
         public static void perftRoot(ulong bKB, ulong bQB, ulong bRB, ulong bBB, ulong bNB, ulong bPB, ulong wKB, ulong wQB, ulong wRB, ulong wBB, ulong wNB, ulong wPB, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside, bool white2Move, int depth){
             if (depth < perftMaxDepth){
                 string moves;
+                char[] Cmoves = new char[4];
                 if(white2Move){
                     moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
                 }else{
@@ -43,20 +44,21 @@ namespace ChessBitboard{
 //                     string Substring = moves.Substring(i, 4);
 //                    string Substring = new string (Tools.CharCombine(moves[i], moves[i+1], moves[i+2], moves[i+3]));
                     int start = (((moves[i] - '0') * 8) + (moves[i+1] - '0')); // set start location for each iteration of i
+                    Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3];
 
-                    UInt64 bKBt = Moves.makeMove(bKB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'k', start),
-                        bQBt = Moves.makeMove(bQB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'q', start),
-                        bRBt = Moves.makeMove(bRB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'r', start),
-                        bBBt = Moves.makeMove(bBB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'b', start),
-                        bNBt = Moves.makeMove(bNB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'n', start),
-                        bPBt = Moves.makeMove(bPB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'p', start),
-                        wKBt = Moves.makeMove(wKB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'K', start),
-                        wQBt = Moves.makeMove(wQB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'Q', start),
-                        wRBt = Moves.makeMove(wRB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'R', start),
-                        wBBt = Moves.makeMove(wBB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'B', start),
-                        wNBt = Moves.makeMove(wNB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'N', start),
-                        wPBt = Moves.makeMove(wPB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'P', start),
-                        EPBt = Moves.makeMoveEP(wPB|bPB, moves[i], moves[i+1], moves[i+2], moves[i+3], start);
+                    UInt64 bKBt = Moves.makeMove(bKB, Cmoves, 'k', start),
+                        bQBt = Moves.makeMove(bQB, Cmoves, 'q', start),
+                        bRBt = Moves.makeMove(bRB, Cmoves, 'r', start),
+                        bBBt = Moves.makeMove(bBB, Cmoves, 'b', start),
+                        bNBt = Moves.makeMove(bNB, Cmoves, 'n', start),
+                        bPBt = Moves.makeMove(bPB, Cmoves, 'p', start),
+                        wKBt = Moves.makeMove(wKB, Cmoves, 'K', start),
+                        wQBt = Moves.makeMove(wQB, Cmoves, 'Q', start),
+                        wRBt = Moves.makeMove(wRB, Cmoves, 'R', start),
+                        wBBt = Moves.makeMove(wBB, Cmoves, 'B', start),
+                        wNBt = Moves.makeMove(wNB, Cmoves, 'N', start),
+                        wPBt = Moves.makeMove(wPB, Cmoves, 'P', start),
+                        EPBt = Moves.makeMoveEP(wPB|bPB, Cmoves, start);
                     // wRBt = Moves.CastleMove(wRBt, wKB|bKB, Substring, 'R');
                     // wRBt = Moves.CastleMove(bRBt, bKB|wKB, moves.Substring(i, 4), 'r');
                     // BoardGeneration.drawBitboard(bRBt);
@@ -112,6 +114,7 @@ namespace ChessBitboard{
         public static void perft(ulong bKB, ulong bQB, ulong bRB, ulong bBB, ulong bNB, ulong bPB, ulong wKB, ulong wQB, ulong wRB, ulong wBB, ulong wNB, ulong wPB, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside, bool white2Move, int depth){
             if (depth < perftMaxDepth){
                 string moves;
+                char[] Cmoves = new char[4];
                 if(white2Move){
                     moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
                 }else{
@@ -121,20 +124,21 @@ namespace ChessBitboard{
                      // string Substring = moves.Substring(i, 4);
 //                     string Substring = new string (Tools.CharCombine(moves[i], moves[i+1], moves[i+2], moves[i+3]));
                     int start = (((moves[i] - '0') * 8) + (moves[i+1] - '0')); // set start location for each iteration of i
+                    Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3];
 
-                    UInt64 bKBt = Moves.makeMove(bKB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'k', start),
-                        bQBt = Moves.makeMove(bQB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'q', start),
-                        bRBt = Moves.makeMove(bRB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'r', start),
-                        bBBt = Moves.makeMove(bBB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'b', start),
-                        bNBt = Moves.makeMove(bNB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'n', start),
-                        bPBt = Moves.makeMove(bPB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'p', start),
-                        wKBt = Moves.makeMove(wKB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'K', start),
-                        wQBt = Moves.makeMove(wQB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'Q', start),
-                        wRBt = Moves.makeMove(wRB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'R', start),
-                        wBBt = Moves.makeMove(wBB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'B', start),
-                        wNBt = Moves.makeMove(wNB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'N', start),
-                        wPBt = Moves.makeMove(wPB, moves[i], moves[i+1], moves[i+2], moves[i+3], 'P', start),
-                        EPBt = Moves.makeMoveEP(wPB|bPB, moves[i], moves[i+1], moves[i+2], moves[i+3], start);
+                    UInt64 bKBt = Moves.makeMove(bKB, Cmoves, 'k', start),
+                        bQBt = Moves.makeMove(bQB, Cmoves, 'q', start),
+                        bRBt = Moves.makeMove(bRB, Cmoves, 'r', start),
+                        bBBt = Moves.makeMove(bBB, Cmoves, 'b', start),
+                        bNBt = Moves.makeMove(bNB, Cmoves, 'n', start),
+                        bPBt = Moves.makeMove(bPB, Cmoves, 'p', start),
+                        wKBt = Moves.makeMove(wKB, Cmoves, 'K', start),
+                        wQBt = Moves.makeMove(wQB, Cmoves, 'Q', start),
+                        wRBt = Moves.makeMove(wRB, Cmoves, 'R', start),
+                        wBBt = Moves.makeMove(wBB, Cmoves, 'B', start),
+                        wNBt = Moves.makeMove(wNB, Cmoves, 'N', start),
+                        wPBt = Moves.makeMove(wPB, Cmoves, 'P', start),
+                        EPBt = Moves.makeMoveEP(wPB|bPB, Cmoves, start);
                    // wRBt = Moves.CastleMove(wRBt, wKB, moves.Substring(i, 4), 'R');
                    // wRBt = Moves.CastleMove(bRBt, bKB, moves.Substring(i, 4), 'r');
                     bool castleWKsideT = castleWKside, castleWQsideT = castleWQside, castleBKsideT = castleBKside, castleBQsideT = castleBQside;

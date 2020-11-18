@@ -93,9 +93,9 @@ namespace ChessBitboard{
 
         }
 
-        public static UInt64 makeMove(UInt64 board, char zero ,char one, char two, char three, char type, int start){
-            if ( Char.IsDigit(three)){ //if last digit of move string is digit then its a normal move
-                int end = (((two - '0') * 8) + (three - '0'));
+        public static UInt64 makeMove(UInt64 board, char[] moves, char type, int start){
+            if ( Char.IsDigit(moves[3])){ //if last digit of move string is digit then its a normal move
+                int end = (((moves[2] - '0') * 8) + (moves[3] - '0'));
                 if (((board >> start) & 1) == 1) {
                     board = board & ~((UInt64)1 << start); // remove piece from start
                     board = board | ((UInt64)1 << end); // add the piece to the end
@@ -103,30 +103,30 @@ namespace ChessBitboard{
                 else{
                     board = board & ~((UInt64)1 << end);
                 }
-            }else if(three == 'P'){ // if last char in move string is P its a promotion
+            }else if(moves[3] == 'P'){ // if last char in move string is P its a promotion
                 int startp, endp;
-                if (char.IsUpper(two)){ // if 3 char is upper case then its white promoting a piece
-                    startp = Tools.trailingZerosRight(Filemasks8[zero - '0'] & Rankmasks8[6]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
-                    endp = Tools.trailingZerosRight(Filemasks8[one - '0'] & Rankmasks8[7]);
+                if (char.IsUpper(moves[2])){ // if 3 char is upper case then its white promoting a piece
+                    startp = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[6]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
+                    endp = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[7]);
                 }else{
-                    startp = Tools.trailingZerosRight(Filemasks8[zero - '0'] & Rankmasks8[1]);
-                    endp = Tools.trailingZerosRight(Filemasks8[one - '0'] & Rankmasks8[0]);
+                    startp = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[1]);
+                    endp = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[0]);
                 }
-                if(type == two) {
+                if(type == moves[2]) {
                     board = board & ~((UInt64)1 << startp); // remove piece from start
                     board = board | ((UInt64)1 << endp); // add the piece to the end
                 }
             }
-            else if (three == 'E'){ // if last char is E the move is en passant
+            else if (moves[3] == 'E'){ // if last char is E the move is en passant
                 int starte, ende;
-                if (two == 'W'){ // if 3 char is W then its white en passant
-                    starte = Tools.trailingZerosRight(Filemasks8[zero - '0'] & Rankmasks8[4]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
-                    ende = Tools.trailingZerosRight(Filemasks8[one - '0'] & Rankmasks8[5]);
-                    board = board & ~((UInt64)1 << (int)(Filemasks8[one - '0'] & Rankmasks8[4])); // remove taken pawn - file is move to and rank is the startering rank which is the rank opponent will be at
+                if (moves[2] == 'W'){ // if 3 char is W then its white en passant
+                    starte = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[4]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
+                    ende = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[5]);
+                    board = board & ~((UInt64)1 << (int)(Filemasks8[moves[1] - '0'] & Rankmasks8[4])); // remove taken pawn - file is move to and rank is the startering rank which is the rank opponent will be at
                 }else{
-                    starte = Tools.trailingZerosRight(Filemasks8[zero - '0'] & Rankmasks8[3]);
-                    ende = Tools.trailingZerosRight(Filemasks8[one - '0'] & Rankmasks8[2]);
-                    board = board & ~((UInt64)1 << (int)(Filemasks8[one - '0'] & Rankmasks8[3])); // remove taken pawn
+                    starte = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[3]);
+                    ende = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[2]);
+                    board = board & ~((UInt64)1 << (int)(Filemasks8[moves[1] - '0'] & Rankmasks8[3])); // remove taken pawn
                 }
                 if (((board >> starte) & 1 ) == 1 ){ // if pieceBoard is equal to start location
                     board = board & ~((UInt64)1 << starte); // remove piece from start location
@@ -168,10 +168,10 @@ namespace ChessBitboard{
             return Rook;
         }
 
-        public static UInt64 makeMoveEP(UInt64 board, char zero, char one, char two, char three, int start){
-            if (Char.IsDigit(three)){
-                if ((Math.Abs(zero - two) == 2) && (((board >> start) & 1) == 1)){// means it was pawn double push
-                    return Filemasks8[one - '0'];
+        public static UInt64 makeMoveEP(UInt64 board, char[] moves, int start){
+            if (Char.IsDigit(moves[3])){
+                if ((Math.Abs(moves[0] - moves[2]) == 2) && (((board >> start) & 1) == 1)){// means it was pawn double push
+                    return Filemasks8[moves[1] - '0'];
                 }
             }
             return 0;
