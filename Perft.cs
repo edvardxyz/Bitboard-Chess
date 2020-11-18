@@ -40,20 +40,21 @@ namespace ChessBitboard{
                     //             Console.ReadKey();
                 }
                 for (int i = 0; i < moves.Length; i+=4){
-                    UInt64 bRBt = Moves.makeMove(bRB, moves.Substring(i, 4), 'r'),
-                        bQBt = Moves.makeMove(bQB, moves.Substring(i, 4), 'q'),
-                        bKBt = Moves.makeMove(bKB, moves.Substring(i, 4), 'k'),
-                        bBBt = Moves.makeMove(bBB, moves.Substring(i, 4), 'b'),
-                        bNBt = Moves.makeMove(bNB, moves.Substring(i, 4), 'n'),
-                        bPBt = Moves.makeMove(bPB, moves.Substring(i, 4), 'p'),
-                        wKBt = Moves.makeMove(wKB, moves.Substring(i, 4), 'K'),
-                        wQBt = Moves.makeMove(wQB, moves.Substring(i, 4), 'Q'),
-                        wRBt = Moves.makeMove(wRB, moves.Substring(i, 4), 'R'),
-                        wBBt = Moves.makeMove(wBB, moves.Substring(i, 4), 'B'),
-                        wNBt = Moves.makeMove(wNB, moves.Substring(i, 4), 'N'),
-                        wPBt = Moves.makeMove(wPB, moves.Substring(i, 4), 'P'),
-                        EPBt = Moves.makeMoveEP(wPB|bPB, moves.Substring(i, 4));
-                    // wRBt = Moves.CastleMove(wRBt, wKB|bKB, moves.Substring(i, 4), 'R');
+                    string Substring = moves.Substring(i, 4);
+                    UInt64 bRBt = Moves.makeMove(bRB, Substring, 'r'),
+                        bQBt = Moves.makeMove(bQB, Substring, 'q'),
+                        bKBt = Moves.makeMove(bKB, Substring, 'k'),
+                        bBBt = Moves.makeMove(bBB, Substring, 'b'),
+                        bNBt = Moves.makeMove(bNB, Substring, 'n'),
+                        bPBt = Moves.makeMove(bPB, Substring, 'p'),
+                        wKBt = Moves.makeMove(wKB, Substring, 'K'),
+                        wQBt = Moves.makeMove(wQB, Substring, 'Q'),
+                        wRBt = Moves.makeMove(wRB, Substring, 'R'),
+                        wBBt = Moves.makeMove(wBB, Substring, 'B'),
+                        wNBt = Moves.makeMove(wNB, Substring, 'N'),
+                        wPBt = Moves.makeMove(wPB, Substring, 'P'),
+                        EPBt = Moves.makeMoveEP(wPB|bPB, Substring);
+                    // wRBt = Moves.CastleMove(wRBt, wKB|bKB, Substring, 'R');
                     // wRBt = Moves.CastleMove(bRBt, bKB|wKB, moves.Substring(i, 4), 'r');
                     // BoardGeneration.drawBitboard(bRBt);
                     // BoardGeneration.drawBitboard(wQBt);
@@ -89,19 +90,20 @@ namespace ChessBitboard{
                     moves = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
                 }
                 for (int i = 0; i < moves.Length; i+=4){
-                    UInt64 bKBt = Moves.makeMove(bKB, moves.Substring(i, 4), 'k'),
-                        bQBt = Moves.makeMove(bQB, moves.Substring(i, 4), 'q'),
-                        bRBt = Moves.makeMove(bRB, moves.Substring(i, 4), 'r'),
-                        bBBt = Moves.makeMove(bBB, moves.Substring(i, 4), 'b'),
-                        bNBt = Moves.makeMove(bNB, moves.Substring(i, 4), 'n'),
-                        bPBt = Moves.makeMove(bPB, moves.Substring(i, 4), 'p'),
-                        wKBt = Moves.makeMove(wKB, moves.Substring(i, 4), 'K'),
-                        wQBt = Moves.makeMove(wQB, moves.Substring(i, 4), 'Q'),
-                        wRBt = Moves.makeMove(wRB, moves.Substring(i, 4), 'R'),
-                        wBBt = Moves.makeMove(wBB, moves.Substring(i, 4), 'B'),
-                        wNBt = Moves.makeMove(wNB, moves.Substring(i, 4), 'N'),
-                        wPBt = Moves.makeMove(wPB, moves.Substring(i, 4), 'P'),
-                        EPBt = Moves.makeMoveEP(wPB|bPB, moves.Substring(i, 4));
+                    string Substring = moves.Substring(i, 4);
+                    UInt64 bKBt = Moves.makeMove(bKB, Substring, 'k'),
+                        bQBt = Moves.makeMove(bQB, Substring, 'q'),
+                        bRBt = Moves.makeMove(bRB, Substring, 'r'),
+                        bBBt = Moves.makeMove(bBB, Substring, 'b'),
+                        bNBt = Moves.makeMove(bNB, Substring, 'n'),
+                        bPBt = Moves.makeMove(bPB, Substring, 'p'),
+                        wKBt = Moves.makeMove(wKB, Substring, 'K'),
+                        wQBt = Moves.makeMove(wQB, Substring, 'Q'),
+                        wRBt = Moves.makeMove(wRB, Substring, 'R'),
+                        wBBt = Moves.makeMove(wBB, Substring, 'B'),
+                        wNBt = Moves.makeMove(wNB, Substring, 'N'),
+                        wPBt = Moves.makeMove(wPB, Substring, 'P'),
+                        EPBt = Moves.makeMoveEP(wPB|bPB, Substring);
                    // wRBt = Moves.CastleMove(wRBt, wKB, moves.Substring(i, 4), 'R');
                    // wRBt = Moves.CastleMove(bRBt, bKB, moves.Substring(i, 4), 'r');
                     bool castleWKsideT = castleWKside, castleWQsideT = castleWQside, castleBKsideT = castleBKside, castleBQsideT = castleBQside;
