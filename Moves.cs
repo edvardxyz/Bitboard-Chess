@@ -41,6 +41,12 @@ namespace ChessBitboard{
         public static UInt64 whitePieces; //white pieces except for white king // used for black pawns
         public static UInt64 empty; // every field empty
         public static UInt64 occupied;
+
+        public static char[] Zero2 = new char[4] {'0', '4', '0', '2'};
+        public static char[] Zero6 = new char[4] {'0', '4', '0', '6'};
+        public static char[] Seven2 = new char[4] {'7', '4', '7', '2'};
+        public static char[] Seven6 = new char[4] {'7', '4', '7', '6'};
+
         public static UInt64[] Rankmasks8 = new UInt64[]{
             0xFF,0xFF00,0xFF0000,0xFF000000,0xFF00000000,0xFF0000000000,0xFF000000000000,0xFF00000000000000
         };
@@ -62,39 +68,9 @@ namespace ChessBitboard{
         };
 
 
-        public static char unicode2ShortHand(char c){
-            switch(c){
-                case BoardGeneration.bQC:
-                    return 'q';
-
-                case BoardGeneration.wQC:
-                    return 'Q';
-
-                case BoardGeneration.bBC:
-                    return 'b';
-
-                case BoardGeneration.bRC:
-                    return 'r';
-
-                case BoardGeneration.bNC:
-                    return 'n';
-
-                case BoardGeneration.wRC:
-                    return 'R';
-
-                case BoardGeneration.wBC:
-                    return 'B';
-
-                case BoardGeneration.wNC:
-                    return 'N';
-                default:
-                    return '0';
-            }
-
-        }
 
         public static UInt64 makeMove(UInt64 board, char[] moves, char type, int start){
-            if ( Char.IsDigit(moves[3])){ //if last digit of move string is digit then its a normal move
+            if ( Tools.IsCharDigit(moves[3])){ //if last digit of move string is digit then its a normal move
                 int end = (((moves[2] - '0') * 8) + (moves[3] - '0'));
                 if (((board >> start) & 1) == 1) {
                     board = board & ~((UInt64)1 << start); // remove piece from start
@@ -138,39 +114,75 @@ namespace ChessBitboard{
             return board;
         }
 
-        public static UInt64 CastleMove(UInt64 Rook, UInt64 King, string move, char type){
-            int start = (((move[0] - '0') * 8) + (move[1] - '0'));
-            if((((King >> start) & 1) == 1) && (("0402" == move) || ("0406" == move) || ("7472" == move) || ("7476" == move))){
-                if(type == 'R'){
-                    switch(move){
-                        case "7472":
-                            Rook = Rook & ~((UInt64)1 << 56); // remove piece from start
-                            Rook = Rook | ((UInt64)1 << 59); // add the piece to d1 sq
-                            break;
-                        case "7476":
-                            Rook = Rook & ~((UInt64)1 << 63); // remove piece from start
-                            Rook = Rook | ((UInt64)1 << 61); // add the piece to f1 sq
-                            break;
-                    }
-                } else if (type == 'r') {
-                    switch(move){
-                        case "0402":
-                            Rook = Rook & ~((UInt64)1); // remove piece from start
-                            Rook = Rook | ((UInt64)1 << 3); // add the piece to f8 sq
-                            break;
-                        case "0406":
-                            Rook = Rook & ~((UInt64)1 << 7); // remove piece from start
-                            Rook = Rook | ((UInt64)1 << 5); // add the piece to d1 sq
-                            break;
+        public static UInt64 CastleMove(UInt64 Rook, UInt64 King, char[] Cmoves, char type, int start){
+            if (((King >> start) & 1) == 1){
+                if (Tools.ArrC(Cmoves, Zero2) || Tools.ArrC(Cmoves, Zero6) || Tools.ArrC(Cmoves, Seven2) || Tools.ArrC(Cmoves, Seven6)){
+                    string move = new string(Cmoves);
+                    if(type == 'R'){
+                        switch(move){
+                            case "7472":
+                                Rook = Rook & ~((UInt64)1 << 56); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 59); // add the piece to d1 sq
+                                break;
+                            case "7476":
+                                Rook = Rook & ~((UInt64)1 << 63); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 61); // add the piece to f1 sq
+                                break;
+                        }
+                    } else if (type == 'r') {
+                        switch(move){
+                            case "0402":
+                                Rook = Rook & ~((UInt64)1); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 3); // add the piece to f8 sq
+                                break;
+                            case "0406":
+                                Rook = Rook & ~((UInt64)1 << 7); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 5); // add the piece to d1 sq
+                                break;
+                        }
                     }
                 }
             }
             return Rook;
         }
 
+    /*
+        public static UInt64 CastleMove1(UInt64 Rook, UInt64 King, char[] Cmoves, char type, int start){
+            if (((King >> start) & 1) == 1){
+                string move = new string(Cmoves);
+                if (("0402" == move) || ("0406" == move) || ("7472" == move) || ("7476" == move)){
+                    if(type == 'R'){
+                        switch(move){
+                            case "7472":
+                                Rook = Rook & ~((UInt64)1 << 56); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 59); // add the piece to d1 sq
+                                break;
+                            case "7476":
+                                Rook = Rook & ~((UInt64)1 << 63); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 61); // add the piece to f1 sq
+                                break;
+                        }
+                    } else if (type == 'r') {
+                        switch(move){
+                            case "0402":
+                                Rook = Rook & ~((UInt64)1); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 3); // add the piece to f8 sq
+                                break;
+                            case "0406":
+                                Rook = Rook & ~((UInt64)1 << 7); // remove piece from start
+                                Rook = Rook | ((UInt64)1 << 5); // add the piece to d1 sq
+                                break;
+                        }
+                    }
+                }
+            }
+            return Rook;
+        }
+*/
+
         public static UInt64 makeMoveEP(UInt64 board, char[] moves, int start){
-            if (Char.IsDigit(moves[3])){
-                if ((Math.Abs(moves[0] - moves[2]) == 2) && (((board >> start) & 1) == 1)){// means it was pawn double push
+            if (Tools.IsCharDigit(moves[3])){
+                if ((Tools.Abs(moves[0] - moves[2]) == 2) && (((board >> start) & 1) == 1)){// means it was pawn double push
                     return Filemasks8[moves[1] - '0'];
                 }
             }
@@ -618,10 +630,10 @@ namespace ChessBitboard{
             //king
             int kLocation = Tools.trailingZerosRight(bKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
-            if(kLocation > 54){
-                possible = kingSpan << (kLocation-54);
+            if(kLocation > 18){
+                possible = kingSpan << (kLocation-18);
             }else {
-                possible = kingSpan >> (54-kLocation);
+                possible = kingSpan >> (18-kLocation);
             }
 
             if(kLocation % 8<4){
@@ -685,10 +697,10 @@ namespace ChessBitboard{
             //king
             int kLocation = Tools.trailingZerosRight(wKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
 
-            if(kLocation > 54){
-                possible = kingSpan << (kLocation-54);
+            if(kLocation > 18){
+                possible = kingSpan << (kLocation-18);
             }else {
-                possible = kingSpan >> (54-kLocation);
+                possible = kingSpan >> (18-kLocation);
             }
 
             if(kLocation % 8<4){

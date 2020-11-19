@@ -205,6 +205,55 @@ namespace ChessBitboard{
             return reverse;
         }
 
+        public static char unicode2ShortHand(char c){
+            switch(c){
+                case BoardGeneration.bQC:
+                    return 'q';
+
+                case BoardGeneration.wQC:
+                    return 'Q';
+
+                case BoardGeneration.bBC:
+                    return 'b';
+
+                case BoardGeneration.bRC:
+                    return 'r';
+
+                case BoardGeneration.bNC:
+                    return 'n';
+
+                case BoardGeneration.wRC:
+                    return 'R';
+
+                case BoardGeneration.wBC:
+                    return 'B';
+
+                case BoardGeneration.wNC:
+                    return 'N';
+                default:
+                    return '0';
+            }
+
+        }
+
+        public static bool ArrC(char[] arr1, char[] arr2){
+
+            if( arr1[0] != arr2[0] ) { return false;}
+            if( arr1[1] != arr2[1] ) { return false;}
+            if( arr1[2] != arr2[2] ) { return false;}
+            if( arr1[3] != arr2[3] ) { return false;}
+
+            return true;
+        }
+
+        public static bool IsCharDigit(char c){
+            return ((c >= '0') && (c <= '9'));
+        }
+
+        public static int Abs(int i){
+            return ((i + (i >> 31)) ^ (i >> 31));
+        }
+
         public static char[] CharCombine(char c0, char c1, char c2, char c3){
             char[] c = new char[4];
             c[0] = c0;

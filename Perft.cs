@@ -25,7 +25,7 @@ namespace ChessBitboard{
 
         public static int perftMoveCount = 0;
         public static int perftTotalCount = 0;
-        static int perftMaxDepth = 5;
+        static int perftMaxDepth = 4;
 
         public static void perftRoot(ulong bKB, ulong bQB, ulong bRB, ulong bBB, ulong bNB, ulong bPB, ulong wKB, ulong wQB, ulong wRB, ulong wBB, ulong wNB, ulong wPB, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside, bool white2Move, int depth){
             if (depth < perftMaxDepth){
@@ -59,11 +59,17 @@ namespace ChessBitboard{
                         wNBt = Moves.makeMove(wNB, Cmoves, 'N', start),
                         wPBt = Moves.makeMove(wPB, Cmoves, 'P', start),
                         EPBt = Moves.makeMoveEP(wPB|bPB, Cmoves, start);
-                    // wRBt = Moves.CastleMove(wRBt, wKB|bKB, Substring, 'R');
-                    // wRBt = Moves.CastleMove(bRBt, bKB|wKB, moves.Substring(i, 4), 'r');
-                    // BoardGeneration.drawBitboard(bRBt);
-                    // BoardGeneration.drawBitboard(wQBt);
-                    // Console.ReadKey();
+
+                   wRBt = Moves.CastleMove(wRBt, wKB, Cmoves, 'R', start);
+                   bRBt = Moves.CastleMove(bRBt, bKB, Cmoves, 'r', start);
+
+                 /*
+                    BoardGeneration.drawArray(bKBt, bQBt, bRBt, bBBt, bNBt, bPBt, wKBt, wQBt, wRBt, wBBt, wNBt, wPBt);
+                    Console.WriteLine();
+                    Console.ReadKey();
+                    Console.Clear();
+                */
+
                     bool castleWKsideT = castleWKside, castleWQsideT = castleWQside, castleBKsideT = castleBKside, castleBQsideT = castleBQside;
 
 // 40 ms faster when castling is false // 40 ms slower when true // 70 ms faster if no check nothing to gain it seems
@@ -139,8 +145,17 @@ namespace ChessBitboard{
                         wNBt = Moves.makeMove(wNB, Cmoves, 'N', start),
                         wPBt = Moves.makeMove(wPB, Cmoves, 'P', start),
                         EPBt = Moves.makeMoveEP(wPB|bPB, Cmoves, start);
-                   // wRBt = Moves.CastleMove(wRBt, wKB, moves.Substring(i, 4), 'R');
-                   // wRBt = Moves.CastleMove(bRBt, bKB, moves.Substring(i, 4), 'r');
+
+                    wRBt = Moves.CastleMove(wRBt, wKB, Cmoves, 'R', start);
+                    bRBt = Moves.CastleMove(bRBt, bKB, Cmoves, 'r', start);
+
+                /*
+                    BoardGeneration.drawArray(bKBt, bQBt, bRBt, bBBt, bNBt, bPBt, wKBt, wQBt, wRBt, wBBt, wNBt, wPBt);
+                    Console.WriteLine();
+                    Console.ReadKey();
+                    Console.Clear();
+                */
+
                     bool castleWKsideT = castleWKside, castleWQsideT = castleWQside, castleBKsideT = castleBKside, castleBQsideT = castleBQside;
 
                     if( castleWKsideT || castleWQsideT ){
