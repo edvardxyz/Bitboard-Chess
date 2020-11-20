@@ -158,22 +158,26 @@ namespace ChessBitboard{
         public static UInt64 HandVMoves(int square){
             UInt64 bitboardSq = (UInt64)1 << square;
             UInt64 revO = Tools.reverseBit(occupied);
-            UInt64 revBitSq = Tools.reverseBitSingle(bitboardSq);
+            UInt64 revBitSq = Tools.reverseBitSingle(bitboardSq) * 2;
+            int rank = square / 8;
+            int file = square % 8;
             //turn square number into binary bitboard representing piece
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) for horizontal attacks
             // first part is attack toward MSB (right)
-            UInt64 possibleH = (occupied - 2 * bitboardSq) ^ Tools.reverseBit(revO - 2 * revBitSq);
+            UInt64 possibleH = (occupied - 2 * bitboardSq) ^ Tools.reverseBit(revO - revBitSq);
             // use ( o - 2r ) ^ reverse( reverse(o) - 2 * reverse(r)) same but with masksing occupied with the file the piece is on for vertical attacks
-            UInt64 possibleV = ((occupied & Filemasks8[square % 8]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & Filemasks8[square % 8]) - (2 * revBitSq));
-            return (possibleH & Rankmasks8[square / 8]) | (possibleV & Filemasks8[square % 8]); // & with masks and | to combine vertial and horizontal
+            UInt64 possibleV = ((occupied & Filemasks8[file]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & Filemasks8[file]) - revBitSq);
+            return (possibleH & Rankmasks8[rank]) | (possibleV & Filemasks8[file]); // & with masks and | to combine vertial and horizontal
         }
 
         public static UInt64 DandAntiDMoves(int square){
+            int rank = square / 8;
+            int file = square % 8;
             UInt64 bitboardSq = (UInt64)1 << square;
             UInt64 revBitSq = Tools.reverseBitSingle(bitboardSq);
-            UInt64 possibleD = ((occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & Diagonalmasks8[(square / 8) + (square % 8)]) - (2 * revBitSq));
-            UInt64 possibleAntiD = ((occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]) - (2 * revBitSq));
-            return (possibleD & Diagonalmasks8[(square / 8) + (square % 8)]) | (possibleAntiD & AntiDiagonalmasks8[(square / 8) + 7 - (square % 8)]);
+            UInt64 possibleD = ((occupied & Diagonalmasks8[rank + file]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & Diagonalmasks8[rank + file]) - (2 * revBitSq));
+            UInt64 possibleAntiD = ((occupied & AntiDiagonalmasks8[rank + 7 - file]) - (2 * bitboardSq)) ^ Tools.reverseBit(Tools.reverseBit(occupied & AntiDiagonalmasks8[rank + 7 - file]) - (2 * revBitSq));
+            return (possibleD & Diagonalmasks8[rank + file]) | (possibleAntiD & AntiDiagonalmasks8[rank + 7 - file]);
         }
 
         private static StringBuilder list = new StringBuilder();
