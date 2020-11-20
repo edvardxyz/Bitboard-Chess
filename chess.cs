@@ -12,9 +12,61 @@ namespace ChessBitboard{
 
         public static void Main (){
 
+             BoardGeneration.initiateStdChess();
+
+
+
+
+
             // Console.WriteLine(Perft.algebra2Move("e2e3"));
             // Console.WriteLine(Perft.move2Algebra("6454"));
-            BoardGeneration.initiateStdChess();
+            /*
+        Console.WriteLine("public static UInt64[] Knight = new UInt64[64];");
+
+            for(int i = 1; i<19; i++){
+                if((i+17) % 8 < 4){
+                    UInt64 printx = Moves.kingSpan >> i;
+                    printx = printx & ~Moves.fileGH;
+                    Console.Write($"{printx},");
+                      // BoardGeneration.drawBitboard(printx);
+                      // Console.Read();
+                }else{
+                    UInt64 printx = Moves.kingSpan >> i;
+                    printx = printx & ~Moves.fileAB;
+                    Console.Write($"{printx},");
+                      // BoardGeneration.drawBitboard(printx);
+                      // Console.Read();
+
+                }
+            }
+            Console.WriteLine();
+            for(int i = 0; i<64-18;i++){
+                if((i+18) % 8 < 4){
+                    UInt64 printx = Moves.kingSpan << i;
+                    printx = printx & ~Moves.fileGH;
+                    Console.Write($"{printx},");
+                     // BoardGeneration.drawBitboard(printx);
+                     // Console.Read();
+                }else{
+                    UInt64 printx = Moves.kingSpan << i;
+                    printx = printx & ~Moves.fileAB;
+                    Console.Write($"{printx},");
+                     // BoardGeneration.drawBitboard(printx);
+                     // Console.Read();
+                }
+            }
+            */
+/*
+                int count = 0;
+            foreach(UInt64 n in Span.Knight ){
+                BoardGeneration.drawBitboard(n);
+                Console.WriteLine(n);
+                Console.WriteLine(count);
+                Console.ReadKey(true);
+                count++;
+
+            }
+*/
 
 
             // UInt64 bKingBoard = 0x800000000000000;

@@ -204,6 +204,137 @@ namespace ChessBitboard{
                 if (((bitboard >>63)&1)==1) { reverse = reverse ^ 1; }
             return reverse;
         }
+        public static UInt64 reverseBitx(UInt64 bitboard){
+            UInt64 reverse = 0;
+                if ((bitboard & 1)==1) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 2)==2) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 4)==4) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 8)==8) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 16)==16) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 32)==32) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 64)==64) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 128)==128) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 256)==256) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 512)==512) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 1024)==1024) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 2048)==2048) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 4096)==4096) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x2000)==0x2000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x4000)==0x4000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x8000)==0x8000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x10000)==0x10000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x20000)==0x20000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x40000)==0x40000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard &0x80000)==0x80000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x100000)==0x100000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x200000)==0x200000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x400000)==0x400000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x800000)==0x800000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard& 0x1000000)==0x1000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x2000000)==0x2000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x4000000)==0x4000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x8000000)==0x8000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x10000000)==0x10000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x20000000)==0x20000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x40000000)==0x40000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x80000000)==0x80000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x100000000)==0x100000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x200000000)==0x200000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard& 0x400000000)==0x400000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x800000000)==0x800000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard& 0x1000000000)==0x1000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x2000000000)==0x2000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x4000000000)==0x4000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x8000000000)==0x8000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x10000000000)==0x10000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x20000000000)==0x20000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x40000000000)==0x40000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x80000000000)==0x80000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x100000000000)==0x100000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x200000000000)==0x200000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x400000000000)==0x400000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x800000000000)==0x800000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x1000000000000)==0x1000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x2000000000000)==0x2000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x4000000000000)==0x4000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x8000000000000)==0x8000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x10000000000000)==0x10000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x20000000000000)==0x20000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x40000000000000)==0x40000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x80000000000000)==0x80000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x100000000000000)==0x100000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x200000000000000)==0x200000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x400000000000000)==0x400000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x800000000000000)==0x800000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x1000000000000000)==0x1000000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x2000000000000000)==0x2000000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x4000000000000000)==0x4000000000000000) { reverse = reverse ^ 1; }
+                reverse = reverse << 1;
+                if ((bitboard & 0x8000000000000000)==0x8000000000000000) { reverse = reverse ^ 1; }
+            return reverse;
+        }
 
         public static char unicode2ShortHand(char c){
             switch(c){
@@ -271,7 +402,7 @@ namespace ChessBitboard{
             return reverse;
         }
 
-        public static UInt64 reverseBitx(UInt64 bitboard){
+        public static UInt64 reverseBitxx(UInt64 bitboard){
             // is doing XOR on every last 0 faster checking a flag and skip the XOR and just shift the rest?
             UInt64 reverse = 0;
             for(int i = 0; i < 64; i++){

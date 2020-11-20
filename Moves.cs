@@ -15,7 +15,7 @@ using System;
 // using System.Collections.Generic;
 // using System.Linq;
 using System.Text;
-// using System.Threading.Tasks;
+using System.Threading.Tasks;
 // using System.Globalization;
 
 namespace ChessBitboard{
@@ -69,15 +69,15 @@ namespace ChessBitboard{
 
 
 
-        public static UInt64 makeMove(UInt64 board, char[] moves, char type, int start){
+        public static UInt64 makeMove(UInt64 board, char[] moves, char type, int start, int end){
             if ( Tools.IsCharDigit(moves[3])){ //if last digit of move string is digit then its a normal move
-                int end = (((moves[2] - '0') * 8) + (moves[3] - '0'));
+                //int end = (((moves[2] - '0') * 8) + (moves[3] - '0'));
                 if (((board >> start) & 1) == 1) {
                     board = board & ~((UInt64)1 << start); // remove piece from start
                     board = board | ((UInt64)1 << end); // add the piece to the end
                 }
                 else{
-                    board = board & ~((UInt64)1 << end);
+                    board = board & ~((UInt64)1 << end); // remove piece if it got attacked
                 }
             }else if(moves[3] == 'P'){ // if last char in move string is P its a promotion
                 int startp, endp;
@@ -145,40 +145,6 @@ namespace ChessBitboard{
             }
             return Rook;
         }
-
-    /*
-        public static UInt64 CastleMove1(UInt64 Rook, UInt64 King, char[] Cmoves, char type, int start){
-            if (((King >> start) & 1) == 1){
-                string move = new string(Cmoves);
-                if (("0402" == move) || ("0406" == move) || ("7472" == move) || ("7476" == move)){
-                    if(type == 'R'){
-                        switch(move){
-                            case "7472":
-                                Rook = Rook & ~((UInt64)1 << 56); // remove piece from start
-                                Rook = Rook | ((UInt64)1 << 59); // add the piece to d1 sq
-                                break;
-                            case "7476":
-                                Rook = Rook & ~((UInt64)1 << 63); // remove piece from start
-                                Rook = Rook | ((UInt64)1 << 61); // add the piece to f1 sq
-                                break;
-                        }
-                    } else if (type == 'r') {
-                        switch(move){
-                            case "0402":
-                                Rook = Rook & ~((UInt64)1); // remove piece from start
-                                Rook = Rook | ((UInt64)1 << 3); // add the piece to f8 sq
-                                break;
-                            case "0406":
-                                Rook = Rook & ~((UInt64)1 << 7); // remove piece from start
-                                Rook = Rook | ((UInt64)1 << 5); // add the piece to d1 sq
-                                break;
-                        }
-                    }
-                }
-            }
-            return Rook;
-        }
-*/
 
         public static UInt64 makeMoveEP(UInt64 board, char[] moves, int start){
             if (Tools.IsCharDigit(moves[3])){
@@ -250,7 +216,7 @@ namespace ChessBitboard{
         }
 
         public static void possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside){
-            UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occupied);
             if ((unsafeSq & wKB) == 0 ){
                 if (castleWKside == true && ((((UInt64)1 << 63) & wRB) == 1)){
                     if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0){
@@ -289,19 +255,7 @@ namespace ChessBitboard{
 
             while(i != 0){
                 int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
-
-                if(iLocation > 18){
-                    possible = knightSpan << (iLocation-18);
-                }else {
-                    possible = knightSpan >> (18-iLocation);
-                }
-
-                if(iLocation % 8<4){
-                    possible = possible & ~fileGH & notMyPieces;
-                }else{
-                    possible = possible & ~fileAB & notMyPieces;
-                }
-
+                possible = Span.Knight[iLocation] & notMyPieces; // put location in index of array with all 64 possible knight locations // turns out to not be faster than calculating possible location on the spot
                 UInt64 k = possible & ~(possible-1); // get one of the possiblities
                 while (k != 0){ // goes trough each of the possibilies
                     int index = Tools.trailingZerosRight(k); // get index of move to
@@ -312,27 +266,12 @@ namespace ChessBitboard{
                 N = N & ~i; // remove the knight that was checked for all moves
                 i = N & ~(N-1); // get the next knight to check for all moves
             }
-            // int temp = list.Length/4;
-            // Console.WriteLine(temp);
         }
 
         public static void possibleK(UInt64 occupied, UInt64 K){
-            UInt64 possible;
 
             int iLocation = Tools.trailingZerosRight(K); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
-
-            if(iLocation > 18){
-                possible = kingSpan << (iLocation-18);
-            }else {
-                possible = kingSpan >> (18-iLocation);
-            }
-
-            if(iLocation % 8 < 4){
-                possible = possible & ~fileGH & notMyPieces;
-            }else{
-                possible = possible & ~fileAB & notMyPieces;
-            }
-            // BoardGeneration.drawBitboard(possible);
+            UInt64 possible = Span.King[iLocation] & notMyPieces; // put location into index of array with all possible kingspans
 
             UInt64 i = possible & ~(possible-1); // get one of the possiblities
             while (i != 0){ // goes trough each of the possibilies
@@ -341,8 +280,6 @@ namespace ChessBitboard{
                 possible = possible & ~i; // remove the move from possibiliies that was just listed
                 i = possible & ~(possible-1); // get the next move possible
             }
-            // int temp = list.Length/4;
-            // Console.WriteLine(temp);
         }
 
         public static void possibleQ(UInt64 occupied, UInt64 Q){
@@ -362,8 +299,6 @@ namespace ChessBitboard{
                 Q = Q & ~i; // remove the Queen that was checked for all moves
                 i = Q & ~(Q-1); // get the next Queen to check for all moves
             }
-            // int temp = list.Length/4;
-            // Console.WriteLine(temp);
         }
 
         public static void possibleB(UInt64 occupied, UInt64 B){
@@ -383,8 +318,6 @@ namespace ChessBitboard{
                 B = B & ~i; // remove the bishop that was checked for all moves
                 i = B & ~(B-1); // get the next bishop to check for all moves
             }
-            // int temp = list.Length/4;
-            // Console.WriteLine(temp);
         }
 
         public static void possibleR(UInt64 occupied, UInt64 R){
@@ -404,8 +337,6 @@ namespace ChessBitboard{
                 R = R & ~i; // remove the rook that was checked for all moves
                 i = R & ~(R-1); // get the next rook to check for all moves
             }
-            // int temp = list.Length/4;
-            // Console.WriteLine(temp);
         }
 
         public static void possibleWP(UInt64 wPB, UInt64 bPB, UInt64 EPB){
@@ -578,9 +509,9 @@ namespace ChessBitboard{
             }
         }
 
-        public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+        public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 occu){
             UInt64 unsafeSq;
-            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+            occupied = occu;
 
             //pawn
             unsafeSq = ((bPB << 7) & ~fileH); // pawn capture right
@@ -590,19 +521,8 @@ namespace ChessBitboard{
             //knight
             UInt64 i = bNB & ~(bNB-1);
             while(i != 0){
-                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
+                possible = Span.Knight[Tools.trailingZerosRight(i)]; // put location in index of array with all 64 possible knight locations // turns out to not be faster than calculating possible location on the spot
 
-                if(iLocation > 18){
-                    possible = knightSpan << (iLocation-18);
-                }else {
-                    possible = knightSpan >> (18-iLocation);
-                }
-
-                if(iLocation % 8<4){
-                    possible = possible & ~fileGH;
-                }else{
-                    possible = possible & ~fileAB;
-                }
                 unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
                 bNB = bNB & ~i;
                 i = bNB & ~(bNB-1);
@@ -628,26 +548,13 @@ namespace ChessBitboard{
                 i = QandR & ~(QandR-1);
             }
             //king
-            int kLocation = Tools.trailingZerosRight(bKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
-
-            if(kLocation > 18){
-                possible = kingSpan << (kLocation-18);
-            }else {
-                possible = kingSpan >> (18-kLocation);
-            }
-
-            if(kLocation % 8<4){
-                possible = possible & ~fileGH;
-            }else{
-                possible = possible & ~fileAB;
-            }
+            possible = Span.King[Tools.trailingZerosRight(bKB)]; // put location into index of array with all possible kingspans
             unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
             return unsafeSq;
         }
 
         public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             UInt64 unsafeSq;
-            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
 
             //pawn
             unsafeSq = ((wPB >> 7) & ~fileA); // pawn capture right
@@ -657,19 +564,7 @@ namespace ChessBitboard{
             //knight
             UInt64 i = wNB & ~(wNB-1);
             while(i != 0){
-                int iLocation = Tools.trailingZerosRight(i); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
-
-                if(iLocation > 18){
-                    possible = knightSpan << (iLocation-18);
-                }else {
-                    possible = knightSpan >> (18-iLocation);
-                }
-
-                if(iLocation % 8<4){
-                    possible = possible & ~fileGH;
-                }else{
-                    possible = possible & ~fileAB;
-                }
+                possible = Span.Knight[Tools.trailingZerosRight(i)]; // put location in index of array with all 64 possible knight locations // turns out to not be faster than calculating possible location on the spot
                 unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
                 wNB = wNB & ~i;
                 i = wNB & ~(wNB-1);
@@ -695,19 +590,7 @@ namespace ChessBitboard{
                 i = QandR & ~(QandR-1);
             }
             //king
-            int kLocation = Tools.trailingZerosRight(wKB); // get number of zeroes until first 1 from left to right - the number is equal to the index on board of knight
-
-            if(kLocation > 18){
-                possible = kingSpan << (kLocation-18);
-            }else {
-                possible = kingSpan >> (18-kLocation);
-            }
-
-            if(kLocation % 8<4){
-                possible = possible & ~fileGH;
-            }else{
-                possible = possible & ~fileAB;
-            }
+            possible = Span.King[Tools.trailingZerosRight(wKB)]; // put location into index of array with all possible kingspans
             unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
             return unsafeSq;
         }
