@@ -35,10 +35,9 @@ namespace ChessBitboard{
         public static UInt64 kingSide = 0xF0F0F0F0F0F0F0F;
         public static UInt64 queenSide = 0xF0F0F0F0F0F0F0F0;
         public static UInt64 notMyPieces; // every piece that the side can not capture including oppesit side king to stop illegal capture
-        public static UInt64 blackPieces; //black pieces except for black king // used for white pawns
-        public static UInt64 whitePieces; //white pieces except for white king // used for black pawns
         public static UInt64 empty; // every field empty
         public static UInt64 occupied;
+        public static UInt64 notMyPiecesAndOccu;
 
         public static char[] Zero2 = new char[4] {'0', '4', '0', '2'};
         public static char[] Zero6 = new char[4] {'0', '4', '0', '6'};
@@ -80,15 +79,17 @@ namespace ChessBitboard{
             }else if(moves[3] == 'P'){ // if last char in move string is P its a promotion
                 int startp, endp;
                 if (char.IsUpper(moves[2])){ // if 3 char is upper case then its white promoting a piece
-                    startp = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[6]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
-                    endp = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[7]);
-                }else{
-                    startp = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[1]);
+                    startp = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[1]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
                     endp = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[0]);
+                }else{
+                    startp = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[6]);
+                    endp = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[7]);
                 }
-                if(type == moves[2]) {
-                    board = board & ~((UInt64)1 << startp); // remove piece from start
+                if(type == moves[2]) { // if the promote is the same as the pieceboard making moves, add the promoted piece to board on endp location
                     board = board | ((UInt64)1 << endp); // add the piece to the end
+                }else {
+                    board = board & ~((UInt64)1 << startp); // remove piece from start
+                    board = board & ~((UInt64)1 <<endp);
                 }
             }
             else if (moves[3] == 'E'){ // if last char is E the move is en passant // moves[0] and moves[1] is file from and file to
@@ -180,9 +181,9 @@ namespace ChessBitboard{
 
         public static string possibleMovesW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
             notMyPieces=~(wKB|wQB|wRB|wNB|wBB|wPB|bKB); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
-            blackPieces = bQB|bRB|bNB|bBB|bPB; // all the black pieces without king to avoid illegal capture
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
             empty = ~occupied;// indicates empty fields with a 1 with flip ~ of occupied
+            notMyPiecesAndOccu = notMyPieces & occupied;
 
             list.Clear();
 
@@ -192,15 +193,15 @@ namespace ChessBitboard{
             possibleQ(occupied, wQB);
             possibleN(occupied, wNB);
             possibleK(occupied, wKB);
-            possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside, occupied);
+            possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside);
 
             return list.ToString();
         }
         public static string possibleMovesB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
             notMyPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
-            whitePieces = wQB|wRB|wNB|wBB|wPB; // all the white pieces without king to avoid illegal capture
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
             empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
+            notMyPiecesAndOccu = notMyPieces & occupied;
 
             list.Clear();
 
@@ -210,15 +211,15 @@ namespace ChessBitboard{
             possibleQ(occupied, bQB);
             possibleN(occupied, bNB);
             possibleK(occupied, bKB);
-            possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside, occupied);
+            possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside);
 
             return list.ToString();
         }
 
-        public static void possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside, UInt64 occu){
+        public static void possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside){
             if (castleWKside){ // check if king has moved or rook on king side moved
-                if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0){ // sq in between are empty
-                    UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0 && ((wRB & ((UInt64)1 << 63)) != 0)){ // sq in between are empty
+                    UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
                     if((unsafeSq & ((wKB | ((UInt64)1 << 61)) | ((UInt64)1 << 62))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("7476");
                     }
@@ -226,8 +227,8 @@ namespace ChessBitboard{
             }
 
             if (castleWQside){ // check if king has moved or rook on queen side moved
-                if ((occupied & (((UInt64)1 << 57) | ((UInt64)1 << 58) | ((UInt64)1 << 59))) == 0){ // sq in between are empty
-                    UInt64 unsafeSqWQ = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                if ((occupied & (((UInt64)1 << 57) | ((UInt64)1 << 58) | ((UInt64)1 << 59))) == 0 && ((wRB & ((UInt64)1 << 56)) != 0)){ // sq in between are empty
+                    UInt64 unsafeSqWQ = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
                     if((unsafeSqWQ & ((wKB | ((UInt64)1 << 58)) | ((UInt64)1 << 59))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("7472");
                     }
@@ -235,10 +236,10 @@ namespace ChessBitboard{
             }
         }
 
-        public static void possibleCB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleBKside, bool castleBQside, UInt64 occu){
+        public static void possibleCB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleBKside, bool castleBQside){
             if (castleBKside){ // check if king has moved or rook on king side moved
-                if ((occupied & (((UInt64)1 << 5) | ((UInt64)1 << 6))) == 0){ // sq in between are empty
-                    UInt64 unsafeSq = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                if ((occupied & (((UInt64)1 << 5) | ((UInt64)1 << 6))) == 0 && ((bRB & ((UInt64)1 << 7)) != 0)){ // sq in between are empty
+                    UInt64 unsafeSq = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
                     if((unsafeSq & ((bKB | ((UInt64)1 << 5)) | ((UInt64)1 << 6))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("0406");
                     }
@@ -246,8 +247,8 @@ namespace ChessBitboard{
             }
 
             if (castleBQside){ // check if king has moved or rook on queen side moved
-                if ((occupied & (((UInt64)1 << 1) | ((UInt64)1 << 2) | ((UInt64)1 << 3))) == 0){ // sq in between are empty
-                    UInt64 unsafeSqBQ = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                if ((occupied & (((UInt64)1 << 1) | ((UInt64)1 << 2) | ((UInt64)1 << 3))) == 0 && ((bRB & (UInt64)1) != 0)){ // sq in between are empty
+                    UInt64 unsafeSqBQ = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
                     if((unsafeSqBQ & ((bKB | ((UInt64)1 << 2)) | ((UInt64)1 << 3))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("0402");
                     }
@@ -348,7 +349,7 @@ namespace ChessBitboard{
         public static void possibleWP(UInt64 wPB, UInt64 bPB, UInt64 EPB){
 
             //x1,y1,x2,y2
-            UInt64 pMoves = (wPB>>7) & blackPieces & ~rank8 & ~fileA; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
+            UInt64 pMoves = (wPB>>7) & notMyPiecesAndOccu & ~rank8 & ~fileA; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             /*  gets the first pawn-bit-move and puts into possibleMoves (if any) in a bitboard alone to put into moves list:
              *  possibleMoves =
              *  pMove = 10100011
@@ -368,7 +369,7 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1); // gets the next move alone in a bitboard
             }
 
-            pMoves = (wPB>>9) & blackPieces & ~rank8 & ~fileH; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
+            pMoves = (wPB>>9) & notMyPiecesAndOccu & ~rank8 & ~fileH; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
@@ -395,7 +396,7 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1);
             }
             // y1, y2, promotype, "P"
-            pMoves = (wPB>>7) & blackPieces & rank8 & ~fileA; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
+            pMoves = (wPB>>7) & notMyPiecesAndOccu & rank8 & ~fileA; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
@@ -404,7 +405,7 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1);
             }
 
-            pMoves = (wPB>>9) & blackPieces & rank8 & ~fileH; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
+            pMoves = (wPB>>9) & notMyPiecesAndOccu & rank8 & ~fileH; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
@@ -438,7 +439,7 @@ namespace ChessBitboard{
 
         public static void possibleBP(UInt64 bPB, UInt64 wPB, UInt64 EPB){
             //x1,y1,x2,y2
-            UInt64 pMoves = (bPB<<7) & whitePieces & ~rank1 & ~fileH;// shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
+            UInt64 pMoves = (bPB<<7) & notMyPiecesAndOccu & ~rank1 & ~fileH;// shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             UInt64 possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves); // puts the index to the first pawn by counting number of 0's to the right
@@ -447,7 +448,7 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1); // gets the next move alone in a bitboard
             }
 
-            pMoves = (bPB<<9) & whitePieces & ~rank1 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
+            pMoves = (bPB<<9) & notMyPiecesAndOccu & ~rank1 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
@@ -474,7 +475,7 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1);
             }
             // y1, y2, promotype, "P"
-            pMoves = (bPB<<7) & whitePieces & rank1 & ~fileH; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
+            pMoves = (bPB<<7) & notMyPiecesAndOccu & rank1 & ~fileH; // shift everything to the right by 7 to indicate capture right, and there is black piece and not on rank8 and not file H to stop capture one the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
@@ -483,7 +484,7 @@ namespace ChessBitboard{
                 possibleMoves = pMoves & ~(pMoves-1);
             }
 
-            pMoves = (bPB<<9) & whitePieces & rank1 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
+            pMoves = (bPB<<9) & notMyPiecesAndOccu & rank1 & ~fileA; // shift everything to the right by 9 to indicate capture left, and there is black piece and not on rank8 and not file A to stop capture on the other side of board
             possibleMoves=pMoves&~(pMoves-1);
             while (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
@@ -515,9 +516,9 @@ namespace ChessBitboard{
             }
         }
 
-        public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 occu){
+        public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             UInt64 unsafeSq;
-            occupied = occu;
+            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB;
 
             //pawn
             unsafeSq = ((bPB << 7) & ~fileH); // pawn capture right
@@ -559,9 +560,10 @@ namespace ChessBitboard{
             return unsafeSq;
         }
 
-        public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 occu){
+        public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             UInt64 unsafeSq;
-            occupied = occu;
+//            occupied = occu;
+            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB;
 
             //pawn
             unsafeSq = ((wPB >> 7) & ~fileA); // pawn capture right

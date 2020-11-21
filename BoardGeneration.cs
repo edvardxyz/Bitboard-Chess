@@ -26,8 +26,8 @@ namespace ChessBitboard{
         // king castle check
         public static bool castleWKside = true;
         public static bool castleWQside = true;
-        public static bool castleBKside = false;
-        public static bool castleBQside = false;
+        public static bool castleBKside = true;
+        public static bool castleBQside = true;
 
         public static bool white2Move = true;
         public static UInt64 EPB = 0;
@@ -62,22 +62,22 @@ namespace ChessBitboard{
                 {wPC,eC,eC,eC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,eC,wQC,wKC,wBC,eC,wRC},
                 */
-/*
                 // Black pawns infront of white pawns and white infront of black
-                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
-                {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
-                {eC,wPC,eC,wPC,eC,wPC,eC,wPC},
+                /*
+                {bKC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {bPC,bPC,eC,bPC,eC,bPC,eC,bPC},
-                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
-                {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-               */
-
-                {eC,eC,bKC,bRC,eC,eC,eC,bRC},
-                {bPC,eC,bPC,wNC,bQC,bPC,bBC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,eC,eC,eC,eC,eC,bPC,eC},
+                {eC,eC,eC,eC,wKC,eC,eC,wRC},
+                */
+// r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq
+                {bRC,eC,eC,eC,bKC,eC,eC,bRC},
+                {bPC,eC,bPC,bPC,bQC,bPC,bBC,eC},
                 {bBC,bNC,eC,eC,bPC,bNC,bPC,eC},
-                {eC,eC,eC,wPC,eC,eC,eC,eC},
+                {eC,eC,eC,wPC,wNC,eC,eC,eC},
                 {eC,bPC,eC,eC,wPC,eC,eC,eC},
                 {eC,eC,wNC,eC,eC,wQC,eC,bPC},
                 {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
