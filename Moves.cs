@@ -30,8 +30,6 @@ namespace ChessBitboard{
         public static UInt64 rank4 = 0xFF00000000;
         public static UInt64 rank5 = 0xFF000000;
         public static UInt64 rank8 = 0xFF;
-        public static UInt64 kingSpan = 0xE0A0E00;
-        public static UInt64 knightSpan = 0xA1100110A;
         public static UInt64 center = 0x1818000000;
         public static UInt64 centerBig = 0x3C3C3C3C0000;
         public static UInt64 kingSide = 0xF0F0F0F0F0F0F0F;
@@ -93,16 +91,16 @@ namespace ChessBitboard{
                     board = board | ((UInt64)1 << endp); // add the piece to the end
                 }
             }
-            else if (moves[3] == 'E'){ // if last char is E the move is en passant
+            else if (moves[3] == 'E'){ // if last char is E the move is en passant // moves[0] and moves[1] is file from and file to
                 int starte, ende;
                 if (moves[2] == 'W'){ // if 3 char is W then its white en passant
-                    starte = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[4]); // get start position by ANDing rank and file - i only have start file and end file - i know a promotion for white can only happen from rank 7 to 8
-                    ende = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[5]);
-                    board = board & ~((UInt64)1 << (int)(Filemasks8[moves[1] - '0'] & Rankmasks8[4])); // remove taken pawn - file is move to and rank is the startering rank which is the rank opponent will be at
+                    starte = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[3]); // get start position
+                    ende = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[2]); //
+                    board = board & ~(Filemasks8[moves[1] - '0'] & Rankmasks8[3]); // remove taken pawn - file is move to and rank is the startering rank which is the rank opponent will be at
                 }else{
-                    starte = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[3]);
-                    ende = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[2]);
-                    board = board & ~((UInt64)1 << (int)(Filemasks8[moves[1] - '0'] & Rankmasks8[3])); // remove taken pawn
+                    starte = Tools.trailingZerosRight(Filemasks8[moves[0] - '0'] & Rankmasks8[4]);
+                    ende = Tools.trailingZerosRight(Filemasks8[moves[1] - '0'] & Rankmasks8[5]);
+                    board = board & ~(Filemasks8[moves[1] - '0'] & Rankmasks8[4]); // remove taken pawn
                 }
                 if (((board >> starte) & 1 ) == 1 ){ // if pieceBoard is equal to start location
                     board = board & ~((UInt64)1 << starte); // remove piece from start location
@@ -147,12 +145,10 @@ namespace ChessBitboard{
         }
 
         public static UInt64 makeMoveEP(UInt64 board, char[] moves, int start){
-            if (Tools.IsCharDigit(moves[3])){
-                if ((Tools.Abs(moves[0] - moves[2]) == 2) && (((board >> start) & 1) == 1)){// means it was pawn double push
+                if ((Tools.Abs(moves[0] - moves[2]) == 2) && (((board >> start) & 1) == 1)){ // if moved 2 forward on file and pawnboard shifted with start location is 1 then its a pawn
                     return Filemasks8[moves[1] - '0'];
                 }
-            }
-            return 0;
+            return (UInt64)0;
         }
 
         public static UInt64 HandVMoves(int square){
@@ -196,7 +192,7 @@ namespace ChessBitboard{
             possibleQ(occupied, wQB);
             possibleN(occupied, wNB);
             possibleK(occupied, wKB);
-            possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside);
+            possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside, occupied);
 
             return list.ToString();
         }
@@ -214,39 +210,45 @@ namespace ChessBitboard{
             possibleQ(occupied, bQB);
             possibleN(occupied, bNB);
             possibleK(occupied, bKB);
-            possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside);
+            possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside, occupied);
 
             return list.ToString();
         }
 
-        public static void possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside){
-            UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occupied);
-            if ((unsafeSq & wKB) == 0 ){
-                if (castleWKside == true && ((((UInt64)1 << 63) & wRB) == 1)){
-                    if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0){
+        public static void possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside, UInt64 occu){
+            if (castleWKside){ // check if king has moved or rook on king side moved
+                if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0){ // sq in between are empty
+                    UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                    if((unsafeSq & ((wKB | ((UInt64)1 << 61)) | ((UInt64)1 << 62))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("7476");
                     }
                 }
+            }
 
-                if (castleWQside == true && ((((UInt64)1 << 56) & wRB) == 1)){
-                    if ((occupied & (((UInt64)1 << 57) | ((UInt64)1 << 58) | ((UInt64)1 << 59))) == 0){
+            if (castleWQside){ // check if king has moved or rook on queen side moved
+                if ((occupied & (((UInt64)1 << 57) | ((UInt64)1 << 58) | ((UInt64)1 << 59))) == 0){ // sq in between are empty
+                    UInt64 unsafeSqWQ = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                    if((unsafeSqWQ & ((wKB | ((UInt64)1 << 58)) | ((UInt64)1 << 59))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("7472");
                     }
                 }
             }
         }
 
-        public static void possibleCB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleBKside, bool castleBQside){
-            UInt64 unsafeSq = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-            if ((unsafeSq & bKB) == 0){
-                if (castleBKside == true && ((((UInt64)1 << 7) & bRB) == 1)){
-                    if ((occupied & (((UInt64)1 << 5) | ((UInt64)1 << 6))) == 0){
+        public static void possibleCB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleBKside, bool castleBQside, UInt64 occu){
+            if (castleBKside){ // check if king has moved or rook on king side moved
+                if ((occupied & (((UInt64)1 << 5) | ((UInt64)1 << 6))) == 0){ // sq in between are empty
+                    UInt64 unsafeSq = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                    if((unsafeSq & ((bKB | ((UInt64)1 << 5)) | ((UInt64)1 << 6))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("0406");
                     }
                 }
+            }
 
-                if (castleBQside == true && (((UInt64)1 & bRB) == 1)){
-                    if ((occupied & (((UInt64)1 << 1) | ((UInt64)1 << 2) | ((UInt64)1 << 3))) == 0){
+            if (castleBQside){ // check if king has moved or rook on queen side moved
+                if ((occupied & (((UInt64)1 << 1) | ((UInt64)1 << 2) | ((UInt64)1 << 3))) == 0){ // sq in between are empty
+                    UInt64 unsafeSqBQ = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, occu);
+                    if((unsafeSqBQ & ((bKB | ((UInt64)1 << 2)) | ((UInt64)1 << 3))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("0402");
                     }
                 }
@@ -421,16 +423,16 @@ namespace ChessBitboard{
             }
             // y1, y2 E
             // en passant to the right
-            possibleMoves = (wPB << 1) & bPB & rank5 & ~fileA & EPB; // piece location to move, no destination put in hist - does not try and grab moves one by one because there should only be one possible per round
+            possibleMoves = (wPB << 1) & bPB & rank5 & ~fileA & EPB; // location of enemy pawn that is inside the en passant mask(EPB)
             if (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
-                list.Append(index%8-1).Append(index%8).Append("WE");
+                list.Append(index%8-1).Append(index%8).Append("WE"); // file from and to
             }
             // en passant to the left
-            possibleMoves = (wPB >> 1) & bPB & rank5 & ~fileH & EPB;// piece to move no destination put in hist
+            possibleMoves = (wPB >> 1) & bPB & rank5 & ~fileH & EPB;//
             if (possibleMoves != 0){
                 int index = Tools.trailingZerosRight(possibleMoves);
-                list.Append(index%8+1).Append(index%8).Append("WE");
+                list.Append(index%8+1).Append(index%8).Append("WE"); // file from and to
             }
         }
 
@@ -557,8 +559,9 @@ namespace ChessBitboard{
             return unsafeSq;
         }
 
-        public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+        public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 occu){
             UInt64 unsafeSq;
+            occupied = occu;
 
             //pawn
             unsafeSq = ((wPB >> 7) & ~fileA); // pawn capture right

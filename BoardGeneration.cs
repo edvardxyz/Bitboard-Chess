@@ -26,8 +26,8 @@ namespace ChessBitboard{
         // king castle check
         public static bool castleWKside = true;
         public static bool castleWQside = true;
-        public static bool castleBKside = true;
-        public static bool castleBQside = true;
+        public static bool castleBKside = false;
+        public static bool castleBQside = false;
 
         public static bool white2Move = true;
         public static UInt64 EPB = 0;
@@ -74,17 +74,15 @@ namespace ChessBitboard{
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
                */
 
-    /*
-                // Black pawns infront of white pawns
-                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,wQC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {wRC,wNC,wBC,eC,wKC,wBC,wNC,wRC},
-        */
+                {eC,eC,bKC,bRC,eC,eC,eC,bRC},
+                {bPC,eC,bPC,wNC,bQC,bPC,bBC,eC},
+                {bBC,bNC,eC,eC,bPC,bNC,bPC,eC},
+                {eC,eC,eC,wPC,eC,eC,eC,eC},
+                {eC,bPC,eC,eC,wPC,eC,eC,eC},
+                {eC,eC,wNC,eC,eC,wQC,eC,bPC},
+                {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
+                {wRC,eC,eC,eC,wKC,eC,eC,wRC},
+                /*
              // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
@@ -94,6 +92,7 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
+        */
 
             };
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
@@ -180,7 +179,7 @@ namespace ChessBitboard{
          sw.Stop();
          var elapsed = sw.ElapsedMilliseconds;
          Console.WriteLine($"{elapsed} ms");
-             // drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+           //  drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
             Console.WriteLine(Perft.perftTotalCount);
         }
 
