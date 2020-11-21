@@ -82,7 +82,7 @@ namespace ChessBitboard{
                 {eC,eC,wNC,eC,eC,wQC,eC,bPC},
                 {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
                 {wRC,eC,eC,eC,wKC,eC,eC,wRC},
-                /*
+/*
              // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
@@ -92,7 +92,7 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-        */
+*/
 
             };
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
