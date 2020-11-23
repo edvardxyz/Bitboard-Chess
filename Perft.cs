@@ -109,11 +109,16 @@ namespace ChessBitboard{
             if (depth < perftMaxDepth){
                 string moves;
                 char[] Cmoves = new char[4];
+         var sw = System.Diagnostics.Stopwatch.StartNew();
                 if(white2Move){
                     moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
                 }else{
                     moves = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
                 }
+                        sw.Stop();
+                        var elapsed = sw.ElapsedMilliseconds;
+                        Console.WriteLine($"{elapsed} ms");
+                        Console.ReadKey();
                 for (int i = 0; i < moves.Length; i+=4){
                     Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3];
                     int start = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0'));

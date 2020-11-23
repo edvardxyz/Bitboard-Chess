@@ -1,8 +1,3 @@
-// TODO: use stringbuilder instead for the list and hist.
-// strinbuilders do not have indexof and startswith method, might need?
-// stringbuilder is going to be faster
-// DONE: reverse bits faster
-//
 // Algo for sliders
 // ' = reverse: o = occupied: r = rook:
 // lineAttacks = ( o - 2r ) ^ reverse( o'- 2r')
@@ -151,7 +146,6 @@ namespace ChessBitboard{
                 }
             return (UInt64)0;
         }
-
         public static UInt64 HandVMoves(int square){
             UInt64 bitboardSq = (UInt64)1 << square;
             UInt64 revO = Tools.reverseBit(occupied);
