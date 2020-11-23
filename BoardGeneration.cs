@@ -52,28 +52,15 @@ namespace ChessBitboard{
             char[,] chessBoard = new char[,]
             {
                 /*
-                // few pawns
-                {bRC,bNC,bBC,bQC,bKC,bBC,eC,bRC},
-                {bPC,eC,bPC,eC,eC,bPC,eC,bPC},
-                {eC,eC,eC,eC,eC,bNC,eC,eC},
-                {eC,eC,eC,eC,bPC,bPC,eC,eC},
-                {eC,bPC,eC,wPC,wPC,eC,eC,eC},
-                {eC,eC,wPC,eC,wBC,wNC,eC,eC},
-                {wPC,eC,eC,eC,wPC,wPC,wPC,wPC},
-                {wRC,wNC,eC,wQC,wKC,wBC,eC,wRC},
-                */
-                // Black pawns infront of white pawns and white infront of black
-                /*
-                {bKC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,bPC,eC},
-                {eC,eC,eC,eC,wKC,eC,eC,wRC},
-                */
-// r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq
+                  {bKC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,bPC,eC},
+                  {eC,eC,eC,eC,wKC,eC,eC,wRC},
+                // r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq
                 {bRC,eC,eC,eC,bKC,eC,eC,bRC},
                 {bPC,eC,bPC,bPC,bQC,bPC,bBC,eC},
                 {bBC,bNC,eC,eC,bPC,bNC,bPC,eC},
@@ -82,8 +69,8 @@ namespace ChessBitboard{
                 {eC,eC,wNC,eC,eC,wQC,eC,bPC},
                 {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
                 {wRC,eC,eC,eC,wKC,eC,eC,wRC},
-/*
-             // NORMAL CHESS
+                */
+                // NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
@@ -92,11 +79,148 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-*/
 
             };
+
             array2Bitboard(chessBoard, bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+
+            string binaryString;
+            for (int i = 0; i<64;i++){
+                binaryString = "0000000000000000000000000000000000000000000000000000000000000000";
+                binaryString = binaryString.Substring(i +1) + "1" + binaryString.Substring(0, i);
+
+                switch(chessBoard[i/8,i%8]){
+                    case bRC:
+                        bRB += convertString2Bitboard(binaryString);
+                        break;
+                    case bNC:
+                        bNB += convertString2Bitboard(binaryString);
+                        break;
+                    case bBC:
+                        bBB += convertString2Bitboard(binaryString);
+                        break;
+                    case bQC:
+                        bQB += convertString2Bitboard(binaryString);
+                        break;
+                    case bKC:
+                        bKB += convertString2Bitboard(binaryString);
+                        break;
+                    case bPC:
+                        bPB += convertString2Bitboard(binaryString);
+                        break;
+                        // white pieces from here
+                    case wRC:
+                        wRB += convertString2Bitboard(binaryString);
+                        break;
+                    case wNC:
+                        wNB += convertString2Bitboard(binaryString);
+                        break;
+                    case wBC:
+                        wBB += convertString2Bitboard(binaryString);
+                        break;
+                    case wQC:
+                        wQB += convertString2Bitboard(binaryString);
+                        break;
+                    case wKC:
+                        wKB += convertString2Bitboard(binaryString);
+                        break;
+                    case wPC:
+                        wPB += convertString2Bitboard(binaryString);
+                        break;
+                }
+            }
+
+            while(((wKB & Moves.unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB)) == 0 && white2Move)){ // check if black king is in check and its black turn
+
+                Console.WriteLine("Insert play: ");
+                string Wplay = Console.ReadLine();
+                char[] Pmoves = new char[4]; //create array to send to makeMove method
+                char[] Cmoves = new char[4]; //create array to send to makeMove method
+                Pmoves[0] = Wplay[0]; Pmoves[1] = Wplay[1]; Pmoves[2] = Wplay[2]; Pmoves[3] = Wplay[3]; // put char into array for makeMove method
+                string moves;
+                moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
+                for (int i = 0; i < moves.Length; i+=4){ // every move is 4 char so length of movesString / 4 is how many moves possibleMoves method found
+                    Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3]; // put char into array for makeMove method
+                    if (Tools.ArrC(Pmoves, Cmoves)){ // the move is a possible move
+                        if(checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves)){// check if the move causes king in check
+
+                            int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
+                            int end = (((Pmoves[2] - '0') * 8) + (Pmoves[3] - '0')); // get end for every move
+
+                            if ((((UInt64)1 << start) & wKB) != 0) { // if wking moved set false flags
+                                castleWKside = false;
+                                castleWQside = false;
+                            }
+                            if (((((UInt64)1 << start) & wRB) & ((UInt64)1 << 63)) != 0) { // if wrook kingside moves set kingside flag false
+                                castleWKside = false;
+                            }
+                            if (((((UInt64)1 << start) & wRB) & ((UInt64)1 << 56)) != 0) { // if wrook queenside moves set queenside flag false
+                                castleWQside = false;
+                            }
+
+                            // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
+                            bKB = Moves.makeMove(bKB, Cmoves, 'k', start, end);
+                            bQB = Moves.makeMove(bQB, Cmoves, 'q', start, end);
+                            bRB = Moves.makeMove(bRB, Cmoves, 'r', start, end);
+                            bBB = Moves.makeMove(bBB, Cmoves, 'b', start, end);
+                            bNB = Moves.makeMove(bNB, Cmoves, 'n', start, end);
+                            bPB = Moves.makeMove(bPB, Cmoves, 'p', start, end);
+                            wKB = Moves.makeMove(wKB, Cmoves, 'K', start, end);
+                            wQB = Moves.makeMove(wQB, Cmoves, 'Q', start, end);
+                            wRB = Moves.makeMove(wRB, Cmoves, 'R', start, end);
+                            wBB = Moves.makeMove(wBB, Cmoves, 'B', start, end);
+                            wNB = Moves.makeMove(wNB, Cmoves, 'N', start, end);
+                            wPB = Moves.makeMove(wPB, Cmoves, 'P', start, end);
+                            EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, start); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
+                            wRB = Moves.CastleMove(wRB, wKB, Cmoves, 'R', start); // checks if the king made a castle move if true then moves the rook
+                        }
+                    break;
+                    }
+                }
+                Console.Clear();
+                drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            }
         }
+
+
+
+
+
+
+
+
+
+        public static bool checkMove(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, char[] Pmoves){
+            int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
+            int end = (((Pmoves[2] - '0') * 8) + (Pmoves[3] - '0')); // get end for every move
+
+            // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
+            UInt64 bKBt = Moves.makeMove(bKB, Pmoves, 'k', start, end),
+                bQBt = Moves.makeMove(bQB, Pmoves, 'q', start, end),
+                bRBt = Moves.makeMove(bRB, Pmoves, 'r', start, end),
+                bBBt = Moves.makeMove(bBB, Pmoves, 'b', start, end),
+                bNBt = Moves.makeMove(bNB, Pmoves, 'n', start, end),
+                bPBt = Moves.makeMove(bPB, Pmoves, 'p', start, end),
+                wKBt = Moves.makeMove(wKB, Pmoves, 'K', start, end),
+                wQBt = Moves.makeMove(wQB, Pmoves, 'Q', start, end),
+                wRBt = Moves.makeMove(wRB, Pmoves, 'R', start, end),
+                wBBt = Moves.makeMove(wBB, Pmoves, 'B', start, end),
+                wNBt = Moves.makeMove(wNB, Pmoves, 'N', start, end),
+                wPBt = Moves.makeMove(wPB, Pmoves, 'P', start, end),
+                EPBt = Moves.makeMoveEP(wPB|bPB, Pmoves, start); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
+
+            wRBt = Moves.CastleMove(wRBt, wKB, Pmoves, 'R', start); // checks if the king made a castle move if true then moves the rook
+            bRBt = Moves.CastleMove(bRBt, bKB, Pmoves, 'r', start);
+
+            if ((wKBt & Moves.unsafeWhite(bKBt, bQBt, bRBt, bBBt, bNBt, bPBt, wKBt, wQBt, wRBt, wBBt, wNBt, wPBt)) == 0){ // check if black king is in check and its black turn
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+
+
 
         public static void array2Bitboard(char[,] chessBoard, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             string binaryString;
@@ -165,22 +289,26 @@ namespace ChessBitboard{
             //             Console.WriteLine(Perft.move2Algebra(movez.Substring(i, 4)));
             // }
             // Moves.makeMove((ulong)123, "6151", wPC);
-        //     var sw = System.Diagnostics.Stopwatch.StartNew();
-        //     for(int index = 0; index < 500000; index++)
-        //     {
-        //      //    Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-        //         Moves.reverseBit(number);
-        //     }
-        //     sw.Stop();
-        //     var elapsed = sw.ElapsedMilliseconds;
-        //     Console.WriteLine(elapsed);
-         var sw = System.Diagnostics.Stopwatch.StartNew();
+            //     var sw = System.Diagnostics.Stopwatch.StartNew();
+            //     for(int index = 0; index < 500000; index++)
+            //     {
+//            Console.WriteLine(Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside));
+            //         Moves.reverseBit(number);
+            //     }
+            //     sw.Stop();
+            //     var elapsed = sw.ElapsedMilliseconds;
+            //     Console.WriteLine(elapsed);
+        /*
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             Perft.perftRoot(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside, white2Move, 0);
-         sw.Stop();
-         var elapsed = sw.ElapsedMilliseconds;
-         Console.WriteLine($"{elapsed} ms");
-           //  drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
+            sw.Stop();
+            var elapsed = sw.ElapsedMilliseconds;
+            Console.WriteLine($"{elapsed} ms");
             Console.WriteLine(Perft.perftTotalCount);
+
+            */
+
+             drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
         }
 
         public static UInt64 convertString2Bitboard(string binary){
@@ -234,7 +362,7 @@ namespace ChessBitboard{
             for (int i = 0; i < 8; i++){
                 for (int k = 0; k < 8; k++){
                     Console.Write($"[{chessBoard[i,k]}]\u2009");
-                if(k == 7) Console.WriteLine();
+                    if(k == 7) Console.WriteLine();
                 }
                 Console.WriteLine();
             }
@@ -258,11 +386,11 @@ namespace ChessBitboard{
             for (int i = 0; i < 8; i++){
                 for (int k = 0; k < 8; k++){
                     Console.Write($"[{chessbit[i,k]}]\u2009");
-                if(k == 7) Console.WriteLine();
+                    if(k == 7) Console.WriteLine();
                 }
                 Console.WriteLine();
             }
-                Console.WriteLine();
+            Console.WriteLine();
 
         }
 
