@@ -154,7 +154,7 @@ namespace ChessBitboard{
                         Console.WriteLine("Type 'h' for help");
                     }
                     Wplay = Console.ReadLine().ToLower();
-                    if(!(string.IsNullOrEmpty(Wplay)) && Wplay[0] == 'h'){
+                    if(!(string.IsNullOrEmpty(Wplay)) && Wplay[0] == 'h' && Wplay.Length == 1){
                         PrintHelp();
                         Console.Write("\nPress a key to continue");
                         Console.ReadKey(true);
@@ -163,6 +163,7 @@ namespace ChessBitboard{
 
                 Wplay = Tools.algebra2Move(Wplay);
                 Console.WriteLine(Wplay.Length);
+                Console.WriteLine(Wplay);
                 Console.WriteLine("play is");
                 Console.ReadKey(true);
 
@@ -278,7 +279,7 @@ namespace ChessBitboard{
             if(blackwon)
                 Console.WriteLine("You lost against a stupid computer!");
             if(whitewon)
-                Console.WriteLine("You won against the stupid computer!");
+                Console.WriteLine("You won against a stupid computer!");
         }
 
         public static void PrintHelp(){
