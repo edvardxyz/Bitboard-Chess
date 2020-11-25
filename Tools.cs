@@ -4,6 +4,47 @@ namespace ChessBitboard{
 
     public class Tools{
 
+        public static string move2Algebra(string move){ // convert coordinates to algebraic notation
+            string moveString="";
+            if(move[3] == 'P'){
+                moveString = moveString +""+ (char)(move[0]+49);
+                moveString = moveString +""+ (char)(move[1]+49);
+                moveString = moveString + ""+move[2];
+                moveString = moveString + ""+move[3];
+                return moveString;
+            }
+            moveString = moveString + ""+(char)(move[1]+49);
+            moveString = moveString + ""+('8'- (move[0]));
+            moveString = moveString + ""+(char)(move[3]+49);
+            moveString = moveString + ""+('8' - (move[2]));
+            return moveString;
+        }
+
+        public static string algebra2Move(string move){
+            string moveString="";
+            if(move.Length > 4 && move[4] == 'e'){
+                moveString = "";
+                moveString = moveString + ""+(char)(move[0]-49);
+                moveString = moveString + ""+(char)(move[2]-49);
+                moveString = moveString + "W";
+                moveString = moveString + ""+char.ToUpper(move[4]);
+                return moveString;
+            }
+            if(move.Length > 4 && move[4] == 'p'){
+                moveString = "";
+                moveString = moveString + ""+(char)(move[0]-49);
+                moveString = moveString + ""+(char)(move[2]-49);
+                moveString = moveString + ""+char.ToUpper(move[5]);
+                moveString = moveString + ""+char.ToUpper(move[4]);
+                return moveString;
+            }
+            moveString = moveString + ""+('8' - (move[1]));
+            moveString = moveString + ""+(char)(move[0]-49);
+            moveString = moveString + ""+('8' - (move[3]));
+            moveString = moveString + ""+(char)(move[2]-49);
+            return moveString;
+        }
+
         public static int trailingZerosRight(UInt64 move){
                 if (((move)&1)==1) return 0 ;
                 if (((move >>1 )&1)==1) return 1 ;

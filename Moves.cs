@@ -562,7 +562,6 @@ namespace ChessBitboard{
 
         public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
             UInt64 unsafeSq;
-//            occupied = occu;
             occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB;
 
             //pawn
@@ -603,7 +602,6 @@ namespace ChessBitboard{
             unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
             return unsafeSq;
         }
-
     }
 }
 

@@ -2,29 +2,6 @@ using System;
 
 namespace ChessBitboard{
     public class Perft{
-        public static string move2Algebra(string move){ // convert coordinates to algebraic notation
-            string moveString="";
-            if(move[3] == 'P'){
-                moveString = moveString +""+ (char)(move[0]+49);
-                moveString = moveString +""+ (char)(move[1]+49);
-                moveString = moveString + ""+move[2];
-                moveString = moveString + ""+move[3];
-                return moveString;
-            }
-            moveString = moveString + ""+(char)(move[1]+49);
-            moveString = moveString + ""+('8'- (move[0]));
-            moveString = moveString + ""+(char)(move[3]+49);
-            moveString = moveString + ""+('8' - (move[2]));
-            return moveString;
-        }
-        public static string algebra2Move(string move){
-            string moveString="";
-            moveString = moveString + ""+('8' - (move[1]));
-            moveString = moveString + ""+(char)(move[0]-49);
-            moveString = moveString + ""+('8' - (move[3]));
-            moveString = moveString + ""+(char)(move[2]-49);
-            return moveString;
-        }
 
         public static int perftMoveCount = 0;
         public static int perftTotalCount = 0;

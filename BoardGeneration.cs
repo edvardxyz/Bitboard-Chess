@@ -51,26 +51,29 @@ namespace ChessBitboard{
 
             char[,] chessBoard = new char[,]
             {
+
+                /*//
                   {bKC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
-                  {eC,eC,eC,eC,eC,eC,bQC,eC},
-                  {eC,eC,eC,eC,eC,eC,bPC,eC},
-                  {eC,eC,eC,eC,wKC,eC,eC,bRC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,wKC,eC,eC,bPC,eC},
+                  {eC,eC,eC,eC,eC,eC,eC,eC},
+
+                */
                 /*
-                  // r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq
-                  {bRC,eC,eC,eC,bKC,eC,eC,bRC},
-                  {bPC,eC,bPC,bPC,bQC,bPC,bBC,eC},
-                  {bBC,bNC,eC,eC,bPC,bNC,bPC,eC},
-                  {eC,eC,eC,wPC,wNC,eC,eC,eC},
-                  {eC,bPC,eC,eC,wPC,eC,eC,eC},
-                  {eC,eC,wNC,eC,eC,wQC,eC,bPC},
-                  {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
-                  {wRC,eC,eC,eC,wKC,eC,eC,wRC},
-               */   //
-                /*//
+                // r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq
+                {bRC,eC,eC,eC,bKC,eC,eC,bRC},
+                {bPC,eC,bPC,bPC,bQC,bPC,bBC,eC},
+                {bBC,bNC,eC,eC,bPC,bNC,bPC,eC},
+                {eC,eC,eC,wPC,wNC,eC,eC,eC},
+                {eC,bPC,eC,eC,wPC,eC,eC,eC},
+                {eC,eC,wNC,eC,eC,wQC,eC,bPC},
+                {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
+                {wRC,eC,eC,eC,wKC,eC,eC,wRC},
+                */   //
                 //  NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
@@ -80,7 +83,6 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-*/
             };
 
             // makes the individual bitboard correct based on array of char
@@ -130,6 +132,11 @@ namespace ChessBitboard{
                 }
             }
 
+
+
+
+
+
             bool kingsafe = true;
             bool whitewon = false;
             bool blackwon = false;
@@ -155,6 +162,9 @@ namespace ChessBitboard{
                 }while((Wplay.Length < 4) || (string.IsNullOrEmpty(Wplay)) || (Wplay.Length > 6));
 
                 Wplay = Tools.algebra2Move(Wplay);
+                Console.WriteLine(Wplay.Length);
+                Console.WriteLine("play is");
+                Console.ReadKey(true);
 
                 char[] Pmoves = new char[4]; //create array to send to makeMove method
                 char[] Cmoves = new char[4]; //create array to send to makeMove method
@@ -209,7 +219,7 @@ namespace ChessBitboard{
                         kingsafe = false;
                         Console.Write("king is in check");
                         Console.ReadKey();
-                    continue;
+                        continue;
                     }
                     Console.Write("move not found in valid moves");
                     Console.ReadKey();
@@ -227,41 +237,41 @@ namespace ChessBitboard{
                 Random r = new Random();
                 do{// check if the move causes king in check
 
-                int length = moves.Length/4;
-                int randomMoveN = r.Next(0, length)*4;
-                Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // put char into array for makeMove method
+                    int length = moves.Length/4;
+                    int randomMoveN = r.Next(0, length)*4;
+                    Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // put char into array for makeMove method
 
                 }while(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Cmoves, "black"));
 
-                    int startpc = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
-                    int endpc = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0')); // get end for every move
+                int startpc = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
+                int endpc = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0')); // get end for every move
 
-                    if ((((UInt64)1 << startpc) & bKB) != 0) { // if bking moved set false flags
-                        castleBKside = false;
-                        castleBQside = false;
-                    }
-                    if (((((UInt64)1 << startpc) & bRB) & ((UInt64)1 << 7)) != 0) { // if brook kingside moves set king side flag false
-                        castleBKside = false;
-                    }
-                    if (((((UInt64)1 << startpc) & bRB) & (UInt64)1) != 0) { // if brook queenside moves set queensdie flag false
-                        castleBQside = false;
-                    }
+                if ((((UInt64)1 << startpc) & bKB) != 0) { // if bking moved set false flags
+                    castleBKside = false;
+                    castleBQside = false;
+                }
+                if (((((UInt64)1 << startpc) & bRB) & ((UInt64)1 << 7)) != 0) { // if brook kingside moves set king side flag false
+                    castleBKside = false;
+                }
+                if (((((UInt64)1 << startpc) & bRB) & (UInt64)1) != 0) { // if brook queenside moves set queensdie flag false
+                    castleBQside = false;
+                }
 
-                    // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
-                    EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, startpc); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
-                    bRB = Moves.CastleMove(bRB, bKB, Cmoves, 'r', startpc);
-                    bKB = Moves.makeMove(bKB, Cmoves, 'k', startpc, endpc);
-                    bQB = Moves.makeMove(bQB, Cmoves, 'q', startpc, endpc);
-                    bRB = Moves.makeMove(bRB, Cmoves, 'r', startpc, endpc);
-                    bBB = Moves.makeMove(bBB, Cmoves, 'b', startpc, endpc);
-                    bNB = Moves.makeMove(bNB, Cmoves, 'n', startpc, endpc);
-                    bPB = Moves.makeMove(bPB, Cmoves, 'p', startpc, endpc);
-                    wKB = Moves.makeMove(wKB, Cmoves, 'K', startpc, endpc);
-                    wQB = Moves.makeMove(wQB, Cmoves, 'Q', startpc, endpc);
-                    wRB = Moves.makeMove(wRB, Cmoves, 'R', startpc, endpc);
-                    wBB = Moves.makeMove(wBB, Cmoves, 'B', startpc, endpc);
-                    wNB = Moves.makeMove(wNB, Cmoves, 'N', startpc, endpc);
-                    wPB = Moves.makeMove(wPB, Cmoves, 'P', startpc, endpc);
+                // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
+                EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, startpc); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
+                bRB = Moves.CastleMove(bRB, bKB, Cmoves, 'r', startpc);
+                bKB = Moves.makeMove(bKB, Cmoves, 'k', startpc, endpc);
+                bQB = Moves.makeMove(bQB, Cmoves, 'q', startpc, endpc);
+                bRB = Moves.makeMove(bRB, Cmoves, 'r', startpc, endpc);
+                bBB = Moves.makeMove(bBB, Cmoves, 'b', startpc, endpc);
+                bNB = Moves.makeMove(bNB, Cmoves, 'n', startpc, endpc);
+                bPB = Moves.makeMove(bPB, Cmoves, 'p', startpc, endpc);
+                wKB = Moves.makeMove(wKB, Cmoves, 'K', startpc, endpc);
+                wQB = Moves.makeMove(wQB, Cmoves, 'Q', startpc, endpc);
+                wRB = Moves.makeMove(wRB, Cmoves, 'R', startpc, endpc);
+                wBB = Moves.makeMove(wBB, Cmoves, 'B', startpc, endpc);
+                wNB = Moves.makeMove(wNB, Cmoves, 'N', startpc, endpc);
+                wPB = Moves.makeMove(wPB, Cmoves, 'P', startpc, endpc);
 
 
             }
