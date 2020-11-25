@@ -51,15 +51,15 @@ namespace ChessBitboard{
 
             char[,] chessBoard = new char[,]
             {
-                /*
                   {bKC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
                   {eC,eC,eC,eC,eC,eC,eC,eC},
-                  {eC,eC,eC,eC,eC,eC,eC,eC},
+                  {eC,eC,eC,eC,eC,eC,bQC,eC},
                   {eC,eC,eC,eC,eC,eC,bPC,eC},
-                  {eC,eC,eC,eC,wKC,eC,eC,wRC},
+                  {eC,eC,eC,eC,wKC,eC,eC,bRC},
+                /*
                   // r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq
                   {bRC,eC,eC,eC,bKC,eC,eC,bRC},
                   {bPC,eC,bPC,bPC,bQC,bPC,bBC,eC},
@@ -69,8 +69,9 @@ namespace ChessBitboard{
                   {eC,eC,wNC,eC,eC,wQC,eC,bPC},
                   {wPC,wPC,wPC,wBC,wBC,wPC,wPC,wPC},
                   {wRC,eC,eC,eC,wKC,eC,eC,wRC},
-                */
-                // NORMAL CHESS
+               */   //
+                /*//
+                //  NORMAL CHESS
                 {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
@@ -79,7 +80,7 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
-
+*/
             };
 
             // makes the individual bitboard correct based on array of char
@@ -132,7 +133,7 @@ namespace ChessBitboard{
             bool kingsafe = true;
             bool whitewon = false;
             bool blackwon = false;
-            while(true){ // check if black king is in check and its black turn
+            while(true){
                 string Wplay = "";
                 do{
                     Console.Clear();
@@ -160,7 +161,7 @@ namespace ChessBitboard{
                 Pmoves[0] = Wplay[0]; Pmoves[1] = Wplay[1]; Pmoves[2] = Wplay[2]; Pmoves[3] = Wplay[3]; // put char into array for makeMove method
                 string moves;
                 moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
-                if(moves.Length == 0){
+                if( !AnyLegalMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, moves, "white")){
                     blackwon = true;
                     break;
                 }
@@ -199,70 +200,70 @@ namespace ChessBitboard{
                             wNB = Moves.makeMove(wNB, Cmoves, 'N', start, end);
                             wPB = Moves.makeMove(wPB, Cmoves, 'P', start, end);
 
-                            // start computer move
-                            // ***************************************************************
-                            //
-
-
-
-                        } else {
-                            kingsafe = false;
+                            break;
                         }
                     }
                 }
-                // if(!Tools.ArrC(Pmoves, Cmoves) || !checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves, "white")){ // continue while loop if invalid move or king check so not blacks turn
-                //     Console.ReadKey();
-                //     continue;
-                // }
+                if(!Tools.ArrC(Pmoves, Cmoves)){ // continue while loop if invalid move or king check so not blacks turn
+                    if(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves, "white")){
+                        kingsafe = false;
+                        Console.Write("king is in check");
+                        Console.ReadKey();
+                    continue;
+                    }
+                    Console.Write("move not found in valid moves");
+                    Console.ReadKey();
+                    continue;
+                }
 
 
                 /////// BLACK COMPUTER STARTS HERE ///////////////////
                 moves = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
-                if(moves.Length == 0){
+                if( !AnyLegalMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, moves, "black")){
                     whitewon = true;
                     break;
                 }
-                Random r = new Random();
-                int length = moves.Length/4;
-                int randomMoveN = r.Next(0, length);
-                Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // put char into array for makeMove method
-                if(checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Cmoves, "black")){// check if the move causes king in check
-                    int start = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
-                    int end = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0')); // get end for every move
 
-                    if ((((UInt64)1 << start) & bKB) != 0) { // if bking moved set false flags
+                Random r = new Random();
+                do{// check if the move causes king in check
+
+                int length = moves.Length/4;
+                int randomMoveN = r.Next(0, length)*4;
+                Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // put char into array for makeMove method
+
+                }while(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Cmoves, "black"));
+
+                    int startpc = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
+                    int endpc = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0')); // get end for every move
+
+                    if ((((UInt64)1 << startpc) & bKB) != 0) { // if bking moved set false flags
                         castleBKside = false;
                         castleBQside = false;
                     }
-                    if (((((UInt64)1 << start) & bRB) & ((UInt64)1 << 7)) != 0) { // if brook kingside moves set king side flag false
+                    if (((((UInt64)1 << startpc) & bRB) & ((UInt64)1 << 7)) != 0) { // if brook kingside moves set king side flag false
                         castleBKside = false;
                     }
-                    if (((((UInt64)1 << start) & bRB) & (UInt64)1) != 0) { // if brook queenside moves set queensdie flag false
+                    if (((((UInt64)1 << startpc) & bRB) & (UInt64)1) != 0) { // if brook queenside moves set queensdie flag false
                         castleBQside = false;
                     }
 
                     // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
-                    EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, start); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
-                    bRB = Moves.CastleMove(bRB, bKB, Cmoves, 'r', start);
-                    bKB = Moves.makeMove(bKB, Cmoves, 'k', start, end);
-                    bQB = Moves.makeMove(bQB, Cmoves, 'q', start, end);
-                    bRB = Moves.makeMove(bRB, Cmoves, 'r', start, end);
-                    bBB = Moves.makeMove(bBB, Cmoves, 'b', start, end);
-                    bNB = Moves.makeMove(bNB, Cmoves, 'n', start, end);
-                    bPB = Moves.makeMove(bPB, Cmoves, 'p', start, end);
-                    wKB = Moves.makeMove(wKB, Cmoves, 'K', start, end);
-                    wQB = Moves.makeMove(wQB, Cmoves, 'Q', start, end);
-                    wRB = Moves.makeMove(wRB, Cmoves, 'R', start, end);
-                    wBB = Moves.makeMove(wBB, Cmoves, 'B', start, end);
-                    wNB = Moves.makeMove(wNB, Cmoves, 'N', start, end);
-                    wPB = Moves.makeMove(wPB, Cmoves, 'P', start, end);
+                    EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, startpc); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
+                    bRB = Moves.CastleMove(bRB, bKB, Cmoves, 'r', startpc);
+                    bKB = Moves.makeMove(bKB, Cmoves, 'k', startpc, endpc);
+                    bQB = Moves.makeMove(bQB, Cmoves, 'q', startpc, endpc);
+                    bRB = Moves.makeMove(bRB, Cmoves, 'r', startpc, endpc);
+                    bBB = Moves.makeMove(bBB, Cmoves, 'b', startpc, endpc);
+                    bNB = Moves.makeMove(bNB, Cmoves, 'n', startpc, endpc);
+                    bPB = Moves.makeMove(bPB, Cmoves, 'p', startpc, endpc);
+                    wKB = Moves.makeMove(wKB, Cmoves, 'K', startpc, endpc);
+                    wQB = Moves.makeMove(wQB, Cmoves, 'Q', startpc, endpc);
+                    wRB = Moves.makeMove(wRB, Cmoves, 'R', startpc, endpc);
+                    wBB = Moves.makeMove(wBB, Cmoves, 'B', startpc, endpc);
+                    wNB = Moves.makeMove(wNB, Cmoves, 'N', startpc, endpc);
+                    wPB = Moves.makeMove(wPB, Cmoves, 'P', startpc, endpc);
 
 
-
-
-                } else {
-                    kingsafe = false;
-                }
             }
             if(blackwon)
                 Console.WriteLine("You lost against a stupid computer!");
@@ -280,6 +281,19 @@ namespace ChessBitboard{
             Console.WriteLine("En passant moves are made by moving behind enemy pawn and ending with a 'e'");
             Console.WriteLine("Example: a5b6e");
         }
+
+
+        public static bool AnyLegalMove(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, string moves, string player){
+            char[] Cmoves = new char[4];
+            for (int i = 0; i < moves.Length; i+=4){
+                Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3];
+                if(checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Cmoves, player)){
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         public static bool checkMove(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, char[] Pmoves, string player){
             int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
