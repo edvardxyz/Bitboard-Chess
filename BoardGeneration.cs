@@ -68,8 +68,8 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,eC,eC,eC,eC,eC,eC,eC},
-                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
+                {wPC,eC,eC,eC,eC,eC,eC,eC},
+                {eC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
             };
 
@@ -120,7 +120,7 @@ namespace ChessBitboard{
             }
 
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            Perft.perftRoot(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside, white2Move, 0);
+            Perft.perftRoot(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside, !white2Move, 0);
             sw.Stop();
             var elapsed = sw.ElapsedMilliseconds;
             Console.WriteLine($"{elapsed} ms");

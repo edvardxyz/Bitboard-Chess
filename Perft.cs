@@ -6,7 +6,7 @@ namespace ChessBitboard{
         public static int perftMoveCount = 0;
         public static int perftTotalCount = 0;
 
-        static int perftMaxDepth = 4; // set how many ply to search
+        static int perftMaxDepth = 1; // set how many ply to search
 
         public static void perftRoot(UInt64[] bitboards, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside, bool white2Move, int depth){
             if (depth < perftMaxDepth){
@@ -70,6 +70,7 @@ namespace ChessBitboard{
                         ((Tbitboards[0] & Moves.unsafeBlack(Tbitboards)) == 0 && !white2Move)){ // check if black king is in check and its black turn
                         // start next perft search if no checkmate
                         perft(Tbitboards, EPBt, castleWKsideT, castleWQsideT, castleBKsideT, castleBQsideT, !white2Move, depth+1);
+                        Console.WriteLine(Tools.move2Algebra(moves.Substring(i, 4)) + " " + perftMoveCount);
                         perftTotalCount += perftMoveCount; // count moves that are valid out of the possible moves
                         perftMoveCount = 0;
 
