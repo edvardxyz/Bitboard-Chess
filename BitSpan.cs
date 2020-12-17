@@ -3,7 +3,7 @@ using System;
 namespace ChessBitboard{
     public class Span{
 
-        public static UInt64[] Knight = new UInt64[64] {
+        public static UInt64[] Knight = new UInt64[64] { // indeholder alle mulige knight træk ud fra dens posistion hvilket stemmer overens med index i arrayet
             132096,329728,659712,1319424,2638848,5277696,10489856,4202496,
             33816580,84410376,168886289,337772578,675545156,1351090312,2685403152,1075839008,
             8657044482,21609056261,43234889994,86469779988,172939559976,345879119952,687463207072,275414786112,
@@ -14,7 +14,7 @@ namespace ChessBitboard{
             1128098930098176,2257297371824128,4796069720358912,9592139440717824,19184278881435648,38368557762871296,4679521487814656,9077567998918656
         };
 
-        public static UInt64[] King = new UInt64[64] {
+        public static UInt64[] King = new UInt64[64] { // indeholder alle mulige konge træk ud fra dens posistion hvilket stemmer overens med index i arrayet
             770,1797,3594,7188,14376,28752,57504,49216,
             197123,460039,920078,1840156,3680312,7360624,14721248,12599488,
             50463488,117769984,235539968,471079936,942159872,1884319744,3768639488,3225468928,

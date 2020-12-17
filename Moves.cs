@@ -107,8 +107,6 @@ namespace ChessBitboard{
                     board = board & ~((UInt64)1 << starte); // remove piece from start location
                     board = board | ((UInt64)1 << ende); // add pawn to end location (behind taken pawn)
                 }
-            } else {
-                Console.WriteLine("Invalid move");
             }
             return board;
         }

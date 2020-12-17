@@ -1,39 +1,39 @@
 using System;
 // using System.Collections.Generic;
 // using System.Linq;
-// using System.Text;
+using System.Text;
 // using System.Threading.Tasks;
 
 namespace ChessBitboard{
     public class BoardGeneration{
 
-        // unicode char for each piece
-        public const char bKC = '\u2654';
-        public const char bQC = '\u2655';
-        public const char bRC = '\u2656';
-        public const char bBC = '\u2657';
-        public const char bNC = '\u2658';
-        public const char bPC = '\u2659';
-        public const char wKC = '\u265a';
-        public const char wQC = '\u265b';
-        public const char wRC = '\u265c';
-        public const char wBC = '\u265d';
-        public const char wNC = '\u265e';
-        public const char wPC = '\u265f';
-        public const char eC = '\u0020';
+        // unicode karakter for hver skakbrik
+        public const char bKC = '\u2654'; // sort konge unicode
+        public const char bQC = '\u2655'; // sort dronning unicode
+        public const char bRC = '\u2656'; // sort tarn unicode
+        public const char bBC = '\u2657'; // sort lober unicde
+        public const char bNC = '\u2658'; // sort hest unicode
+        public const char bPC = '\u2659'; // sort bonde uni
+        public const char wKC = '\u265a'; // hvid konge uni
+        public const char wQC = '\u265b'; // hvid dronnign uni
+        public const char wRC = '\u265c'; // hvid tarn uni
+        public const char wBC = '\u265d'; // hvid lober uni
+        public const char wNC = '\u265e'; // hvid hest uni
+        public const char wPC = '\u265f'; // hvid bonde uni
+        public const char eC = '\u0020'; // tom unicode
 
 
-        // king castle check
-        public static bool castleWKside = true;
-        public static bool castleWQside = true;
-        public static bool castleBKside = true;
-        public static bool castleBQside = true;
+        // kongerokade flag
+        public static bool castleWKside = true; // hvid konge side
+        public static bool castleWQside = true; // hvid dronnig side
+        public static bool castleBKside = true; // sort konge side
+        public static bool castleBQside = true; // sort dronnig side
 
-        public static bool white2Move = true;
-        public static UInt64 EPB = 0;
+        public static bool white2Move = true; // hvids tur
+        public static UInt64 EPB = 0; // en passant maske bliver sat af makeMoveEP()
 
-        public static void initiateStdChess(){
-            // Initialize array for board
+        public static void initiateStdChess(){ // starter skakspillet og sætter bitboards til hvad positionerne i arrayet er
+            // 12 bitboards 1 for hver brik
             UInt64 bKB = 0;
             UInt64 bQB = 0;
             UInt64 bRB = 0;
@@ -48,8 +48,7 @@ namespace ChessBitboard{
             UInt64 wPB = 0;
 
 
-
-            char[,] chessBoard = new char[,]
+            char[,] chessBoard = new char[,] // 2 dimensional array for startposition
             {
 
                 /*//
@@ -75,7 +74,7 @@ namespace ChessBitboard{
                 {wRC,eC,eC,eC,wKC,eC,eC,wRC},
                 */   //
                 //  NORMAL CHESS
-                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC},
+                {bRC,bNC,bBC,bQC,bKC,bBC,bNC,bRC}, // startposition for spillet
                 {bPC,bPC,bPC,bPC,bPC,bPC,bPC,bPC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
@@ -85,16 +84,15 @@ namespace ChessBitboard{
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
             };
 
-            // makes the individual bitboard correct based on array of char
-            string binaryString;
-            for (int i = 0; i<64;i++){
-                binaryString = "0000000000000000000000000000000000000000000000000000000000000000";
-                binaryString = binaryString.Substring(i +1) + "1" + binaryString.Substring(0, i);
-
-                switch(chessBoard[i/8,i%8]){
-                    case bRC:
-                        bRB += convertString2Bitboard(binaryString);
-                        break;
+            // putter bit i korrekt position for hver briks bitboard
+            string binaryString; // deklerer binarære streng
+            for (int i = 0; i<64;i++){ // looper 64 gange, 1 for hver bit
+                binaryString = "0000000000000000000000000000000000000000000000000000000000000000"; // start streng bitboard
+                binaryString = binaryString.Substring(i +1) + "1" + binaryString.Substring(0, i); // for hver loop sæt 1 ind fra højre. første runde substring er fra index 1 til 63 + '1' plus substring 0,0 giver 0
+                switch(chessBoard[i/8,i%8]){ // i/8 giver hvilken rank og i mod 8 giver hvilken file index i arrayet, som den binære string hører sammen med
+                    case bRC: // hvis indexet i arrayet er sort rook char
+                        bRB += convertString2Bitboard(binaryString); // adder med strengen koverteret til unsigned int 64
+                        break; // break ud af case
                     case bNC:
                         bNB += convertString2Bitboard(binaryString);
                         break;
@@ -133,72 +131,76 @@ namespace ChessBitboard{
             }
 
 
-
-
-
-
-            bool kingsafe = true;
-            bool whitewon = false;
-            bool blackwon = false;
-            while(true){
-                string Wplay = "";
-                do{
-                    Console.Clear();
-                    drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-                    if(!kingsafe){
+            bool kingsafe = true; // bool om kongen er sikker
+            bool whitewon = false; //bool om hvid har vundet
+            bool blackwon = false; // bool om sort har vunder
+            bool qgame = false; // bool om spilleren har valgt q for at stoppe programmet/spillet
+            while(true){ // program loop, kører indtil en break
+                string Wplay = ""; // spillerens play string
+                do{ // do while loop for at få korrekt play af spilleren og printer boardet
+                    Console.Clear(); // renser konsol vindue
+                    drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB); // kalder drawArray for at printe et skakbræt ud fra tilstanden af alle bitboards
+                    if(!kingsafe){ // hvis kongen ikke er sikker informer spilleren
                         Console.WriteLine("Your move made your king in check");
                         Console.WriteLine("Try another move: ");
                         Console.WriteLine("Type 'h' for help");
-                    }else{
+                    }else{ // ellers print insert play og hvordan hjælpemenu tilgås
                         Console.WriteLine("Insert play: ");
                         Console.WriteLine("Type 'h' for help");
                     }
-                    Wplay = Console.ReadLine().ToLower();
-                    if(!(string.IsNullOrEmpty(Wplay)) && Wplay[0] == 'h' && Wplay.Length == 1){
-                        PrintHelp();
-                        Console.Write("\nPress a key to continue");
-                        Console.ReadKey(true);
+                    Wplay = Console.ReadLine().ToLower(); // tager spilleren input og laver lower så caps lock gælder
+                    if(!string.IsNullOrEmpty(Wplay) && Char.ToLower(Wplay[0]) == 'q'){ // hvis strengen ikke er tom og index 0 af playet er q
+                        qgame = true; // sæt qgame til true
                     }
-                }while((Wplay.Length < 4) || (string.IsNullOrEmpty(Wplay)) || (Wplay.Length > 6));
-
-                Wplay = Tools.algebra2Move(Wplay);
-                Console.WriteLine(Wplay.Length);
-                Console.WriteLine(Wplay);
-                Console.WriteLine("play is");
-                Console.ReadKey(true);
-
-                char[] Pmoves = new char[4]; //create array to send to makeMove method
-                char[] Cmoves = new char[4]; //create array to send to makeMove method
-                Pmoves[0] = Wplay[0]; Pmoves[1] = Wplay[1]; Pmoves[2] = Wplay[2]; Pmoves[3] = Wplay[3]; // put char into array for makeMove method
-                string moves;
-                moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
-                if( !AnyLegalMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, moves, "white")){
-                    blackwon = true;
-                    break;
+                    if(!(string.IsNullOrEmpty(Wplay)) && Wplay[0] == 'h' && Wplay.Length == 1){ // hvis strengen ikke er tom og index 0 er h og længden er 1
+                        PrintHelp(); //kald print hjælpemenu
+                        Console.Write("\nPress a key to continue");
+                        Console.ReadKey(true); // venter på keypress fra spiller
+                    }
+                }while(!qgame && ((Wplay.Length < 4) || (string.IsNullOrEmpty(Wplay)) || (Wplay.Length > 6))); // do while kører så længe qgame ikke er false og længden er under 4 eller tom eller mere end 6 lang.
+                if(qgame){ // hvis qgame er true
+                    break; // break ud af spillet
                 }
-                for (int i = 0; i < moves.Length; i+=4){ // every move is 4 char so length of movesString / 4 is how many moves possibleMoves method found
-                    Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3]; // put char into array for makeMove method
-                    if (Tools.ArrC(Pmoves, Cmoves)){ // the move is a possible move
-                        if(checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves, "white")){// check if the move causes king in check
-                            kingsafe = true;
-                            int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
-                            int end = (((Pmoves[2] - '0') * 8) + (Pmoves[3] - '0')); // get end for every move
 
-                            if ((((UInt64)1 << start) & wKB) != 0) { // if wking moved set false flags
+                Wplay = Tools.algebra2Move(Wplay); // laver player inputtet til programmets interne koordinatsystem
+                /*
+                  Console.WriteLine(Wplay.Length);
+                  Console.WriteLine(Wplay);
+                  Console.WriteLine("play is");
+                  Console.ReadKey(true);
+                */
+                char[] Pmoves = new char[4]; // laver char array for at holde på trækket
+                char[] Cmoves = new char[4]; // laver char array for at holde på hvert muligt træk fundet af possibleMovesW
+                Pmoves[0] = Wplay[0]; Pmoves[1] = Wplay[1]; Pmoves[2] = Wplay[2]; Pmoves[3] = Wplay[3]; // putter hvert char i streng ind i char array
+                string moves; // streng der holder på alle mulige træk
+                moves = Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside); // kalder metode der finder alle mulige træk
+                if( !AnyLegalMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, moves, "white")){ // kalder metode der checker om der findes nogen træk
+                    blackwon = true; // sætter blackwon til true så korret meddelse kan printes efter break
+                    break; // breaker ud af program
+                }
+                for (int i = 0; i < moves.Length; i+=4){ // hver move er 4 chars så længden af moves divideret med 4 er antal træk(derfor i incrementer med 4)
+                    Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3]; // putter hver muligt move ind i Cmoves char arrayet
+                    if (Tools.ArrC(Pmoves, Cmoves)){ // checker hvert move om spillerens move er ens med en af de mulige træk
+                        if(checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves, "white")){// checker om trækket for kongen til at blive i skak
+                            kingsafe = true; // sætter kingsafe til true
+                            int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // sætter start index ud fra trækket(minus '0' char konvertere char tallet til int automatisk)
+                            int end = (((Pmoves[2] - '0') * 8) + (Pmoves[3] - '0'));   // sætter slut index ud fra trækket(minus '0' char konvertere char tallet til int automatisk)
+
+                            if ((((UInt64)1 << start) & wKB) != 0) { // hvis hvid konge bevæger sig set kongerokademuligheder til false
                                 castleWKside = false;
                                 castleWQside = false;
                             }
-                            if (((((UInt64)1 << start) & wRB) & ((UInt64)1 << 63)) != 0) { // if wrook kingside moves set kingside flag false
+                            if (((((UInt64)1 << start) & wRB) & ((UInt64)1 << 63)) != 0) { // hvis hvid tårn på index 63(højre) bevæger sig set kongesiden til false
                                 castleWKside = false;
                             }
-                            if (((((UInt64)1 << start) & wRB) & ((UInt64)1 << 56)) != 0) { // if wrook queenside moves set queenside flag false
+                            if (((((UInt64)1 << start) & wRB) & ((UInt64)1 << 56)) != 0) { // hvis dronnigside tårnet bevæger sig set hvid dronning kongerokade til false
                                 castleWQside = false;
                             }
 
-                            // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
-                            EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, start); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
-                            wRB = Moves.CastleMove(wRB, wKB, Cmoves, 'R', start); // checks if the king made a castle move if true then moves the rook
-                            bKB = Moves.makeMove(bKB, Cmoves, 'k', start, end);
+                            // sender alle brikkers bitboard til makeMove metoden for at ændre deres bitboard afhængig af hvad trækket er
+                            EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, start); // sætter en passant masken EPB til den til den fil hvor en bonde bevæger sig 2 ranks op, ellers sætter den 0 så den kun masker en runde
+                            wRB = Moves.CastleMove(wRB, wKB, Cmoves, 'R', start); // checker om kongen bevæger sig 2 træk og sætter tårnets position ud fra det
+                            bKB = Moves.makeMove(bKB, Cmoves, 'k', start, end); // sætter sort konge bitboard til retur værdi af makeMove
                             bQB = Moves.makeMove(bQB, Cmoves, 'q', start, end);
                             bRB = Moves.makeMove(bRB, Cmoves, 'r', start, end);
                             bBB = Moves.makeMove(bBB, Cmoves, 'b', start, end);
@@ -211,55 +213,62 @@ namespace ChessBitboard{
                             wNB = Moves.makeMove(wNB, Cmoves, 'N', start, end);
                             wPB = Moves.makeMove(wPB, Cmoves, 'P', start, end);
 
-                            break;
+                            break; // breaker ud af for loop da trækket blev fundet og resten af moves er ubetydelig
                         }
                     }
                 }
-                if(!Tools.ArrC(Pmoves, Cmoves)){ // continue while loop if invalid move or king check so not blacks turn
-                    if(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves, "white")){
-                        kingsafe = false;
+
+                // Det her er noget rod
+                if(!Tools.ArrC(Pmoves, Cmoves)){ // hvis trækket ikke er i Cmoves       continue while loop if invalid move or king check so not blacks turn
+                    if(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Pmoves, "white")){ // hvis trækket får kongen i check
+                        kingsafe = false; // sæt kingsafe false
                         Console.Write("king is in check");
                         Console.ReadKey();
-                        continue;
+                        continue; // continue loop så turen ikke går til sort/computer hvis trækket er invalid
                     }
-                    Console.Write("move not found in valid moves");
+                    Console.Write("move not found in valid moves"); // trækket er invalid
                     Console.ReadKey();
-                    continue;
+                    continue;// continue loop så turen ikke går til sort/computer hvis trækket er invalid
                 }
 
 
                 /////// BLACK COMPUTER STARTS HERE ///////////////////
-                moves = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
-                if( !AnyLegalMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, moves, "black")){
+                moves = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside); // kalder possibleMovesB som finder alle mulige træk og sætter i strengen moves
+                if( !AnyLegalMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, moves, "black")){ // hvis computeren ikke har nogen lovlige træk break ud og sæt whitewon true
                     whitewon = true;
                     break;
                 }
 
-                Random r = new Random();
-                do{// check if the move causes king in check
+                Random r = new Random(); // laver random object
+                do{// do while loop der prøver tilfælde træk indtil en der er valid
 
-                    int length = moves.Length/4;
-                    int randomMoveN = r.Next(0, length)*4;
-                    Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // put char into array for makeMove method
+                    int length = moves.Length/4; // hvor mange moves der er
+                    int randomMoveN = r.Next(0, length)*4; // tager random tal fra 0 til antal moves og ganger med 4 for at få start index på trækket
+                    Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // putter det random move ind i Cmoves arrayet
 
-                }while(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Cmoves, "black"));
+                }while(!checkMove(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, Cmoves, "black")); // checker trækket
 
-                int startpc = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
-                int endpc = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0')); // get end for every move
 
-                if ((((UInt64)1 << startpc) & bKB) != 0) { // if bking moved set false flags
+                //
+                // det næste er kommenteret når hvid laver et træk
+                //
+
+                int startpc = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0'));
+                int endpc = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0'));
+
+                if ((((UInt64)1 << startpc) & bKB) != 0) {
                     castleBKside = false;
                     castleBQside = false;
                 }
-                if (((((UInt64)1 << startpc) & bRB) & ((UInt64)1 << 7)) != 0) { // if brook kingside moves set king side flag false
+                if (((((UInt64)1 << startpc) & bRB) & ((UInt64)1 << 7)) != 0) {
                     castleBKside = false;
                 }
-                if (((((UInt64)1 << startpc) & bRB) & (UInt64)1) != 0) { // if brook queenside moves set queensdie flag false
+                if (((((UInt64)1 << startpc) & bRB) & (UInt64)1) != 0) {
                     castleBQside = false;
                 }
 
-                // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
-                EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, startpc); // set the en passant mask EPBt to a file if a pawn moved 2 steps // else set it 0 so only round after double move have valid EP move
+
+                EPB = Moves.makeMoveEP(wPB|bPB, Cmoves, startpc);
                 bRB = Moves.CastleMove(bRB, bKB, Cmoves, 'r', startpc);
                 bKB = Moves.makeMove(bKB, Cmoves, 'k', startpc, endpc);
                 bQB = Moves.makeMove(bQB, Cmoves, 'q', startpc, endpc);
@@ -275,12 +284,21 @@ namespace ChessBitboard{
                 wPB = Moves.makeMove(wPB, Cmoves, 'P', startpc, endpc);
 
 
-            }
-            if(blackwon)
+            } // while loop slutter her
+
+            if(blackwon){ // hvis blackwon er true
                 Console.WriteLine("You lost against a stupid computer!");
-            if(whitewon)
+                Console.Read(true);
+            }
+            else if(whitewon){ // hvis whitewon er true
                 Console.WriteLine("You won against a stupid computer!");
-        }
+                Console.Read(true);
+            }
+            else if (qgame){ // hvis qgame er true
+                Console.WriteLine("The game ended before a winner was found!");
+                Console.Read(true);
+            }
+        } // initiatestdchess metode slutter her
 
         public static void PrintHelp(){
             Console.WriteLine("To move a piece first select the piece with algebraic notation.");
@@ -291,9 +309,11 @@ namespace ChessBitboard{
             Console.WriteLine("You can promote the pawn to a (q)queen, (r)rook, (k)knight or (b)bishop.");
             Console.WriteLine("En passant moves are made by moving behind enemy pawn and ending with a 'e'");
             Console.WriteLine("Example: a5b6e");
+            Console.WriteLine("\nType 'q' to quit");
         }
 
 
+        // tager en masse argumenter og checker en string af moves om nogen af dem er lovlige
         public static bool AnyLegalMove(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, string moves, string player){
             char[] Cmoves = new char[4];
             for (int i = 0; i < moves.Length; i+=4){
@@ -343,19 +363,18 @@ namespace ChessBitboard{
             }
         }
 
-
-
-
-
-        public static UInt64 convertString2Bitboard(string binary){
+        public static UInt64 convertString2Bitboard(string binary){ // metode konveterer binær tal skrevet i streng til tal
             return Convert.ToUInt64(binary, 2);
         }
 
+        // printer skakbræt ud fra bitboards
         public static void drawArray(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
-            char[,] chessBoard = new char[8,8];
-            for (int i = 0; i < 64; i++){
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            char[,] chessBoard = new char[8,8]; // 2d array som fyldes ud med chars ud fra positionen af bits
+            for (int i = 0; i < 64; i++){ // fylder array med tom char
                 chessBoard[i/8,i%8] = eC;
             }
+// kører 64 gange, 1 for hvert bit, hvert if statement shifter bitboardet med i og ANDer med 1 og ser om det er 1 - hvilket vil sige at på den plads er der en forekomst af i bitboardet på det index
             for (int i = 0; i < 64; i++){
                 if ((( bKB >> i ) &1 ) == 1) {
                     chessBoard[i/8,i%8] = bKC;
@@ -394,18 +413,20 @@ namespace ChessBitboard{
                     chessBoard[i/8,i%8] = wPC;
                 }
             }
-            for (int i = 0; i < 8; i++){
-                Console.Write(8-i + " ");
-                for (int k = 0; k < 8; k++){
-                    Console.Write($"[{chessBoard[i,k]}]\u2009");
-                    if(k == 7) Console.WriteLine();
+            // her starter loopet der printer skakbrætet
+            for (int i = 0; i < 8; i++){ // i loopet er for hver rank
+                Console.Write(8-i + " "); // printer rank nummer
+                for (int k = 0; k < 8; k++){ // k loopet er for hver file inden i rank i
+                    Console.Write($"[{chessBoard[i,k]}]\u2009"); // udskriver char i chessBoard arrayet i index i,k (rank,file) og laver et halvt mellemrum som er \u2009 unicode
+                    if(k == 7) Console.WriteLine(); // hvis k er 7 lav linje
                 }
-                Console.WriteLine();
+                Console.WriteLine(); // lav linje
             }
-            Console.WriteLine("  (a) (b) (c) (d) (e) (f) (g) (h)");
+            Console.WriteLine("  (a) (b) (c) (d) (e) (f) (g) (h)"); // print file bogstaver
 
         }
 
+// metode ikke brugt, men blev brugt nogen gange til debug og visuelt se forskellige bitboard under programforløb
         public static void drawBitboard(UInt64 bitBoard){
             string[,] chessbit = new string[8,8];
             for (int i = 0; i<64; i++){
@@ -431,98 +452,13 @@ namespace ChessBitboard{
 
         }
 
+    }
+}
+
+/*
         public static string Reverse( string s ){
             char[] charArray = s.ToCharArray();
             Array.Reverse( charArray );
             return new string( charArray );
         }
-    }
-}
-
-// string print = Moves.possibleMovesW("1636", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-// Console.WriteLine($":{print}:");
-// for(int i = 0; i<8;i++){
-// drawBitboard(Moves.kingSpan);
-// }
-// Console.Write(Moves.possibleMovesW("", bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB).Length/4);
-// UInt64 One = 1;
-// UInt64 number = One << 30;
-// Console.WriteLine(number);
-// Console.WriteLine(Moves.reverseBitSingle(number));
-// Console.WriteLine(Moves.reverseBit(number));
-// Moves.possibleMovesB(ulong bKB, ulong bQB, ulong bRB, ulong bBB, ulong bNB, ulong bPB, ulong wKB, ulong wQB, ulong wRB, ulong wBB, ulong wNB, ulong wPB, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside)
-// string movez = Moves.possibleMovesB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside);
-// for (int i = 0; i < movez.Length; i+=4){
-//             Console.WriteLine(Perft.move2Algebra(movez.Substring(i, 4)));
-// }
-// Moves.makeMove((ulong)123, "6151", wPC);
-//     var sw = System.Diagnostics.Stopwatch.StartNew();
-//     for(int index = 0; index < 500000; index++)
-//     {
-//            Console.WriteLine(Moves.possibleMovesW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside));
-//         Moves.reverseBit(number);
-//     }
-//     sw.Stop();
-//     var elapsed = sw.ElapsedMilliseconds;
-//     Console.WriteLine(elapsed);
-/*
-  var sw = System.Diagnostics.Stopwatch.StartNew();
-  Perft.perftRoot(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, EPB, castleWKside, castleWQside, castleBKside, castleBQside, white2Move, 0);
-  sw.Stop();
-  var elapsed = sw.ElapsedMilliseconds;
-  Console.WriteLine($"{elapsed} ms");
-  Console.WriteLine(Perft.perftTotalCount);
-
-  public static void array2Bitboard(char[,] chessBoard, UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
-  string binaryString;
-  // for each of the squares set to 64 zeroes
-  // then it places a one at the index of i (0-64) starting from left to right
-  for (int i = 0; i<64;i++){
-  binaryString = "0000000000000000000000000000000000000000000000000000000000000000";
-  // take a substring of the 64 char first index 1 to end then add 1 and add substring 0 to i.
-  // first iteration the last substring will be substing(0, 0) which contains nothing
-  binaryString = binaryString.Substring(i +1) + "1" + binaryString.Substring(0, i);
-
-  switch(chessBoard[i/8,i%8]){
-  case bRC:
-  bRB += convertString2Bitboard(binaryString);
-  break;
-  case bNC:
-  bNB += convertString2Bitboard(binaryString);
-  break;
-  case bBC:
-  bBB += convertString2Bitboard(binaryString);
-  break;
-  case bQC:
-  bQB += convertString2Bitboard(binaryString);
-  break;
-  case bKC:
-  bKB += convertString2Bitboard(binaryString);
-  break;
-  case bPC:
-  bPB += convertString2Bitboard(binaryString);
-  break;
-  // white pieces from here
-  case wRC:
-  wRB += convertString2Bitboard(binaryString);
-  break;
-  case wNC:
-  wNB += convertString2Bitboard(binaryString);
-  break;
-  case wBC:
-  wBB += convertString2Bitboard(binaryString);
-  break;
-  case wQC:
-  wQB += convertString2Bitboard(binaryString);
-  break;
-  case wKC:
-  wKB += convertString2Bitboard(binaryString);
-  break;
-  case wPC:
-  wPB += convertString2Bitboard(binaryString);
-  break;
-  }
-  }
-  drawArray(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-  }
 */
