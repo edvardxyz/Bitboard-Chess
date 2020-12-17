@@ -177,77 +177,84 @@ namespace ChessBitboard{
 
         private static StringBuilder list = new StringBuilder();
 
-        public static string possibleMovesW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
-            notMyPieces=~(wKB|wQB|wRB|wNB|wBB|wPB|bKB); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
-            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+        public static string possibleMovesW(UInt64[] bitboards, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
+            notMyPieces=~(bitboards[6]|bitboards[7]|bitboards[8]|bitboards[9]|bitboards[10]|bitboards[11]|bitboards[0]); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
+
+            occupied =
+                bitboards[0]|bitboards[1]|bitboards[2]|bitboards[3]|bitboards[4]|bitboards[5]|
+                bitboards[6]|bitboards[7]|bitboards[8]|bitboards[9]|bitboards[10]|bitboards[11]; // or all pieces together to get occupied
+
             empty = ~occupied;// indicates empty fields with a 1 with flip ~ of occupied
+
             notMyPiecesAndOccu = notMyPieces & occupied;
 
             list.Clear();
 
-            possibleWP(wPB, bPB, EPB);
-            possibleB(occupied, wBB);
-            possibleR(occupied, wRB);
-            possibleQ(occupied, wQB);
-            possibleN(occupied, wNB);
-            possibleK(occupied, wKB);
-            possibleCW(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleWKside, castleWQside);
+            possibleWP(bitboards[11], bitboards[5], EPB);
+            possibleB(occupied, bitboards[9]);
+            possibleR(occupied, bitboards[8]);
+            possibleQ(occupied, bitboards[7]);
+            possibleN(occupied, bitboards[10]);
+            possibleK(occupied, bitboards[6]);
+            possibleCW(bitboards, castleWKside, castleWQside);
 
             return list.ToString();
         }
-        public static string possibleMovesB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
-            notMyPieces=~(bKB|bQB|bRB|bNB|bBB|bPB|wKB);
-            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB; // or all pieces together to get occupied
+        public static string possibleMovesB(UInt64[] bitboards, UInt64 EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside){
+            notMyPieces=~(bitboards[0]|bitboards[1]|bitboards[2]|bitboards[3]|bitboards[4]|bitboards[5]|bitboards[6]); // or'd every white piece and black king to indicate what the white pieces cant capture, also black king to avoid illegal capture
+            occupied =
+                bitboards[0]|bitboards[1]|bitboards[2]|bitboards[3]|bitboards[4]|bitboards[5]|
+                bitboards[6]|bitboards[7]|bitboards[8]|bitboards[9]|bitboards[10]|bitboards[11]; // or all pieces together to get occupied
             empty = ~occupied; // indicates empty fields with a 1 with flip ~ of occupied
             notMyPiecesAndOccu = notMyPieces & occupied;
 
             list.Clear();
 
-            possibleBP(bPB, wPB, EPB);
-            possibleB(occupied, bBB);
-            possibleR(occupied, bRB);
-            possibleQ(occupied, bQB);
-            possibleN(occupied, bNB);
-            possibleK(occupied, bKB);
-            possibleCB(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB, castleBKside, castleBQside);
+            possibleBP(bitboards[5], bitboards[11], EPB);
+            possibleB(occupied, bitboards[3]);
+            possibleR(occupied, bitboards[2]);
+            possibleQ(occupied, bitboards[1]);
+            possibleN(occupied, bitboards[4]);
+            possibleK(occupied, bitboards[0]);
+            possibleCB(bitboards, castleBKside, castleBQside);
 
             return list.ToString();
         }
 
-        public static void possibleCW(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleWKside, bool castleWQside){
+        public static void possibleCW(UInt64[] bitboards, bool castleWKside, bool castleWQside){
             if (castleWKside){ // check if king has moved or rook on king side moved
-                if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0 && ((wRB & ((UInt64)1 << 63)) != 0)){ // sq in between are empty
-                    UInt64 unsafeSq = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-                    if((unsafeSq & ((wKB | ((UInt64)1 << 61)) | ((UInt64)1 << 62))) == 0){ // king is not in check and field it moves over are not under attack
+                if ((occupied & (((UInt64)1 << 61) | ((UInt64)1 << 62))) == 0 && ((bitboards[8] & ((UInt64)1 << 63)) != 0)){ // sq in between are empty
+                    UInt64 unsafeSq = unsafeWhite(bitboards);
+                    if((unsafeSq & ((bitboards[6] | ((UInt64)1 << 61)) | ((UInt64)1 << 62))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("7476");
                     }
                 }
             }
 
             if (castleWQside){ // check if king has moved or rook on queen side moved
-                if ((occupied & (((UInt64)1 << 57) | ((UInt64)1 << 58) | ((UInt64)1 << 59))) == 0 && ((wRB & ((UInt64)1 << 56)) != 0)){ // sq in between are empty
-                    UInt64 unsafeSqWQ = unsafeWhite(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-                    if((unsafeSqWQ & ((wKB | ((UInt64)1 << 58)) | ((UInt64)1 << 59))) == 0){ // king is not in check and field it moves over are not under attack
+                if ((occupied & (((UInt64)1 << 57) | ((UInt64)1 << 58) | ((UInt64)1 << 59))) == 0 && ((bitboards[8] & ((UInt64)1 << 56)) != 0)){ // sq in between are empty
+                    UInt64 unsafeSqWQ = unsafeWhite(bitboards);
+                    if((unsafeSqWQ & ((bitboards[6] | ((UInt64)1 << 58)) | ((UInt64)1 << 59))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("7472");
                     }
                 }
             }
         }
 
-        public static void possibleCB(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB, bool castleBKside, bool castleBQside){
+        public static void possibleCB(UInt64[] bitboards, bool castleBKside, bool castleBQside){
             if (castleBKside){ // check if king has moved or rook on king side moved
-                if ((occupied & (((UInt64)1 << 5) | ((UInt64)1 << 6))) == 0 && ((bRB & ((UInt64)1 << 7)) != 0)){ // sq in between are empty
-                    UInt64 unsafeSq = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-                    if((unsafeSq & ((bKB | ((UInt64)1 << 5)) | ((UInt64)1 << 6))) == 0){ // king is not in check and field it moves over are not under attack
+                if ((occupied & (((UInt64)1 << 5) | ((UInt64)1 << 6))) == 0 && ((bitboards[2] & ((UInt64)1 << 7)) != 0)){ // sq in between are empty
+                    UInt64 unsafeSq = unsafeBlack(bitboards);
+                    if((unsafeSq & ((bitboards[0] | ((UInt64)1 << 5)) | ((UInt64)1 << 6))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("0406");
                     }
                 }
             }
 
             if (castleBQside){ // check if king has moved or rook on queen side moved
-                if ((occupied & (((UInt64)1 << 1) | ((UInt64)1 << 2) | ((UInt64)1 << 3))) == 0 && ((bRB & (UInt64)1) != 0)){ // sq in between are empty
-                    UInt64 unsafeSqBQ = unsafeBlack(bKB, bQB, bRB, bBB, bNB, bPB, wKB, wQB, wRB, wBB, wNB, wPB);
-                    if((unsafeSqBQ & ((bKB | ((UInt64)1 << 2)) | ((UInt64)1 << 3))) == 0){ // king is not in check and field it moves over are not under attack
+                if ((occupied & (((UInt64)1 << 1) | ((UInt64)1 << 2) | ((UInt64)1 << 3))) == 0 && ((bitboards[2] & (UInt64)1) != 0)){ // sq in between are empty
+                    UInt64 unsafeSqBQ = unsafeBlack(bitboards);
+                    if((unsafeSqBQ & ((bitboards[0] | ((UInt64)1 << 2)) | ((UInt64)1 << 3))) == 0){ // king is not in check and field it moves over are not under attack
                         list.Append("0402");
                     }
                 }
@@ -514,26 +521,28 @@ namespace ChessBitboard{
             }
         }
 
-        public static UInt64 unsafeWhite(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+        public static UInt64 unsafeWhite(UInt64[] bitboards){
             UInt64 unsafeSq;
-            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB;
+            occupied =
+                bitboards[0]|bitboards[1]|bitboards[2]|bitboards[3]|bitboards[4]|bitboards[5]|
+                bitboards[6]|bitboards[7]|bitboards[8]|bitboards[9]|bitboards[10]|bitboards[11]; // or all pieces together to get occupied
 
             //pawn
-            unsafeSq = ((bPB << 7) & ~fileH); // pawn capture right
-            unsafeSq = unsafeSq | ((bPB << 9) & ~fileA); // pawn capture left
+            unsafeSq = ((bitboards[5] << 7) & ~fileH); // pawn capture right
+            unsafeSq = unsafeSq | ((bitboards[5] << 9) & ~fileA); // pawn capture left
 
             UInt64 possible;
             //knight
-            UInt64 i = bNB & ~(bNB-1);
+            UInt64 i = bitboards[4] & ~(bitboards[4]-1);
             while(i != 0){
                 possible = Span.Knight[Tools.trailingZerosRight(i)]; // put location in index of array with all 64 possible knight locations // turns out to not be faster than calculating possible location on the spot
 
                 unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
-                bNB = bNB & ~i;
-                i = bNB & ~(bNB-1);
+                bitboards[4] = bitboards[4] & ~i;
+                i = bitboards[4] & ~(bitboards[4]-1);
             }
             //bishop and queen
-            UInt64 QandB = bQB|bBB;
+            UInt64 QandB = bitboards[1]|bitboards[3];
             i = QandB & ~(QandB-1);
             while(i !=0){
                 int iLocation = Tools.trailingZerosRight(i);
@@ -543,7 +552,7 @@ namespace ChessBitboard{
                 i = QandB & ~(QandB-1);
             }
             //rook and queen
-            UInt64 QandR = bQB|bRB;
+            UInt64 QandR = bitboards[1]|bitboards[2];
             i = QandR & ~(QandR-1);
             while(i !=0){
                 int iLocation = Tools.trailingZerosRight(i);
@@ -553,30 +562,32 @@ namespace ChessBitboard{
                 i = QandR & ~(QandR-1);
             }
             //king
-            possible = Span.King[Tools.trailingZerosRight(bKB)]; // put location into index of array with all possible kingspans
-            unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
+            possible = Span.King[Tools.trailingZerosRight(bitboards[0])]; // put location into index of array with all possible kingspans
+            unsafeSq = unsafeSq | possible; // add king attack  squares to unsafeSq var
             return unsafeSq;
         }
 
-        public static UInt64 unsafeBlack(UInt64 bKB, UInt64 bQB, UInt64 bRB, UInt64 bBB, UInt64 bNB, UInt64 bPB, UInt64 wKB, UInt64 wQB, UInt64 wRB, UInt64 wBB, UInt64 wNB, UInt64 wPB){
+        public static UInt64 unsafeBlack(UInt64[] bitboards){
             UInt64 unsafeSq;
-            occupied = bKB|bQB|bRB|bBB|bNB|bPB|wKB|wQB|wRB|wBB|wNB|wPB;
+            occupied =
+                bitboards[0]|bitboards[1]|bitboards[2]|bitboards[3]|bitboards[4]|bitboards[5]|
+                bitboards[6]|bitboards[7]|bitboards[8]|bitboards[9]|bitboards[10]|bitboards[11]; // or all pieces together to get occupied
 
             //pawn
-            unsafeSq = ((wPB >> 7) & ~fileA); // pawn capture right
-            unsafeSq = unsafeSq | ((wPB >> 9) & ~fileH); // pawn capture left
+            unsafeSq = ((bitboards[11] >> 7) & ~fileA); // pawn capture right
+            unsafeSq = unsafeSq | ((bitboards[11] >> 9) & ~fileH); // pawn capture left
 
             UInt64 possible;
             //knight
-            UInt64 i = wNB & ~(wNB-1);
+            UInt64 i = bitboards[10] & ~(bitboards[10]-1);
             while(i != 0){
                 possible = Span.Knight[Tools.trailingZerosRight(i)]; // put location in index of array with all 64 possible knight locations // turns out to not be faster than calculating possible location on the spot
                 unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
-                wNB = wNB & ~i;
-                i = wNB & ~(wNB-1);
+                bitboards[10] = bitboards[10] & ~i;
+                i = bitboards[10] & ~(bitboards[10]-1);
             }
             //bishop and queen
-            UInt64 QandB = wQB|wBB;
+            UInt64 QandB = bitboards[7]|bitboards[9];
             i = QandB & ~(QandB-1);
             while(i !=0){
                 int iLocation = Tools.trailingZerosRight(i);
@@ -586,7 +597,7 @@ namespace ChessBitboard{
                 i = QandB & ~(QandB-1);
             }
             //rook and queen
-            UInt64 QandR = wQB|wRB;
+            UInt64 QandR = bitboards[7]|bitboards[8];
             i = QandR & ~(QandR-1);
             while(i !=0){
                 int iLocation = Tools.trailingZerosRight(i);
@@ -596,7 +607,7 @@ namespace ChessBitboard{
                 i = QandR & ~(QandR-1);
             }
             //king
-            possible = Span.King[Tools.trailingZerosRight(wKB)]; // put location into index of array with all possible kingspans
+            possible = Span.King[Tools.trailingZerosRight(bitboards[6])]; // put location into index of array with all possible kingspans
             unsafeSq = unsafeSq | possible; // add knight attack  squares to unsafeSq var
             return unsafeSq;
         }
