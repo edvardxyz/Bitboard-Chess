@@ -6,7 +6,7 @@ namespace ChessBitboard{
         public static int perftMoveCount = 0;
         public static int perftTotalCount = 0;
 
-        static int perftMaxDepth = 1; // set how many ply to search
+        static int perftMaxDepth = 2; // set how many ply to search
 
         public static void perftRoot(UInt64[] bitboards, ulong EPB, bool castleWKside, bool castleWQside, bool castleBKside, bool castleBQside, bool white2Move, int depth){
             if (depth < perftMaxDepth){
@@ -23,6 +23,8 @@ namespace ChessBitboard{
                     int start = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0')); // set start location for each move i counts by 4 to get moves
                     int end = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0')); // get end for every move
 
+                    BoardGeneration.drawArray(bitboards);
+                    Console.Read();
                     // send all piece bitboards to makeMove to make a move or get removed if piece is attacked
             UInt64[] Tbitboards = new UInt64[] {
                 Moves.makeMove(bitboards[0], Cmoves, 'k', start, end),
@@ -66,6 +68,9 @@ namespace ChessBitboard{
                         castleBQsideT = false;
                     }
 
+                    BoardGeneration.drawArray(Tbitboards);
+                    Console.Read();
+
                     if (((Tbitboards[6] & Moves.unsafeWhite(Tbitboards)) == 0 && white2Move) || // check if white king is in check and its white turn
                         ((Tbitboards[0] & Moves.unsafeBlack(Tbitboards)) == 0 && !white2Move)){ // check if black king is in check and its black turn
                         // start next perft search if no checkmate
@@ -92,6 +97,9 @@ namespace ChessBitboard{
                     Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3];
                     int start = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0'));
                     int end = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0'));
+
+                    BoardGeneration.drawArray(bitboards);
+                    Console.Read();
 
             UInt64[] Tbitboards = new UInt64[] {
                 Moves.makeMove(bitboards[0], Cmoves, 'k', start, end),
@@ -135,6 +143,8 @@ namespace ChessBitboard{
                         castleBQsideT = false;
                     }
 
+                    BoardGeneration.drawArray(Tbitboards);
+                    Console.Read();
 
                     if (((Tbitboards[6] & Moves.unsafeWhite(Tbitboards)) == 0 && white2Move) || // check if white king is in check and its white turn
                         ((Tbitboards[0] & Moves.unsafeBlack(Tbitboards)) == 0 && !white2Move)){ // check if black king is in check and its black turn

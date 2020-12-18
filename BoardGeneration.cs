@@ -68,8 +68,8 @@ namespace ChessBitboard{
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
                 {eC,eC,eC,eC,eC,eC,eC,eC},
-                {wPC,eC,eC,eC,eC,eC,eC,eC},
-                {eC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
+                {eC,eC,eC,eC,eC,eC,eC,eC},
+                {wPC,wPC,wPC,wPC,wPC,wPC,wPC,wPC},
                 {wRC,wNC,wBC,wQC,wKC,wBC,wNC,wRC},
             };
 
@@ -119,124 +119,196 @@ namespace ChessBitboard{
                 }
             }
 
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-            Perft.perftRoot(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside, !white2Move, 0);
-            sw.Stop();
-            var elapsed = sw.ElapsedMilliseconds;
-            Console.WriteLine($"{elapsed} ms");
-            Console.WriteLine(Perft.perftTotalCount);
-            Console.ReadKey();
+            char menuChoice;
+            Console.Clear();
+            Console.WriteLine("Choose program mode");
+            Console.WriteLine("a) Play against computer");
+            Console.WriteLine("b) Pit computer against itself");
+            do{
+                menuChoice = Console.ReadKey(true).KeyChar;
+            }while(menuChoice != 'a' && menuChoice != 'b');
 
+
+            bool draw = false;
             bool kingsafe = true; // bool om kongen er sikker
             bool whitewon = false; //bool om hvid har vundet
             bool blackwon = false; // bool om sort har vunder
             bool qgame = false; // bool om spilleren har valgt q for at stoppe programmet/spillet
+            Random r = new Random(); // laver random object
+            char[] Cmoves = new char[4]; // laver char array for at holde på hvert muligt træk fundet af possibleMovesW
+            string moves; // streng der holder på alle mulige træk
             while(true){ // program loop, kører indtil en break
-                string Wplay = ""; // spillerens play string
-                do{ // do while loop for at få korrekt play af spilleren og printer boardet
-                    Console.Clear(); // renser konsol vindue
-                    drawArray(bitboards); // kalder drawArray for at printe et skakbræt ud fra tilstanden af alle bitboards
-                    if(!kingsafe){ // hvis kongen ikke er sikker informer spilleren
-                        Console.WriteLine("Your move made your king in check");
-                        Console.WriteLine("Try another move: ");
-                        Console.WriteLine("Type 'h' for help");
-                    }else{ // ellers print insert play og hvordan hjælpemenu tilgås
-                        Console.WriteLine("Insert play: ");
-                        Console.WriteLine("Type 'h' for help");
+                if(menuChoice == 'a'){
+                    string Wplay = ""; // spillerens play string
+                    do{ // do while loop for at få korrekt play af spilleren og printer boardet
+                        Console.Clear(); // renser konsol vindue
+                        drawArray(bitboards); // kalder drawArray for at printe et skakbræt ud fra tilstanden af alle bitboards
+                        if(!kingsafe){ // hvis kongen ikke er sikker informer spilleren
+                            Console.WriteLine("Your move made your king in check");
+                            Console.WriteLine("Try another move: ");
+                            Console.WriteLine("Type 'h' for help");
+                        }else{ // ellers print insert play og hvordan hjælpemenu tilgås
+                            Console.WriteLine("Insert play: ");
+                            Console.WriteLine("Type 'h' for help");
+                        }
+                        Wplay = Console.ReadLine().ToLower(); // tager spilleren input og laver lower så caps lock gælder
+                        if(!string.IsNullOrEmpty(Wplay) && Char.ToLower(Wplay[0]) == 'q'){ // hvis strengen ikke er tom og index 0 af playet er q
+                            qgame = true; // sæt qgame til true
+                        }
+                        if(!(string.IsNullOrEmpty(Wplay)) && Wplay[0] == 'h' && Wplay.Length == 1){ // hvis strengen ikke er tom og index 0 er h og længden er 1
+                            PrintHelp(); //kald print hjælpemenu
+                            Console.Write("\nPress a key to continue");
+                            Console.ReadKey(true); // venter på keypress fra spiller
+                        }
+                    }while(!qgame && ((Wplay.Length < 4) || (string.IsNullOrEmpty(Wplay)) || (Wplay.Length > 6))); // do while kører så længe qgame ikke er false og længden er under 4 eller tom eller mere end 6 lang.
+                    if(qgame){ // hvis qgame er true
+                        break; // break ud af spillet
                     }
-                    Wplay = Console.ReadLine().ToLower(); // tager spilleren input og laver lower så caps lock gælder
-                    if(!string.IsNullOrEmpty(Wplay) && Char.ToLower(Wplay[0]) == 'q'){ // hvis strengen ikke er tom og index 0 af playet er q
-                        qgame = true; // sæt qgame til true
+
+                    Wplay = Tools.algebra2Move(Wplay); // laver player inputtet til programmets interne koordinatsystem
+                    /*
+                      Console.WriteLine(Wplay.Length);
+                      Console.WriteLine(Wplay);
+                      Console.WriteLine("play is");
+                      Console.ReadKey(true);
+                    */
+                    char[] Pmoves = new char[4]; // laver char array for at holde på trækket
+                    Pmoves[0] = Wplay[0]; Pmoves[1] = Wplay[1]; Pmoves[2] = Wplay[2]; Pmoves[3] = Wplay[3]; // putter hvert char i streng ind i char array
+                    moves = Moves.possibleMovesW(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside); // kalder metode der finder alle mulige træk
+                    if( !AnyLegalMove(bitboards, moves, "white")){ // kalder metode der checker om der findes nogen træk
+                        blackwon = true; // sætter blackwon til true så korret meddelse kan printes efter break
+                        break; // breaker ud af program
                     }
-                    if(!(string.IsNullOrEmpty(Wplay)) && Wplay[0] == 'h' && Wplay.Length == 1){ // hvis strengen ikke er tom og index 0 er h og længden er 1
-                        PrintHelp(); //kald print hjælpemenu
-                        Console.Write("\nPress a key to continue");
-                        Console.ReadKey(true); // venter på keypress fra spiller
-                    }
-                }while(!qgame && ((Wplay.Length < 4) || (string.IsNullOrEmpty(Wplay)) || (Wplay.Length > 6))); // do while kører så længe qgame ikke er false og længden er under 4 eller tom eller mere end 6 lang.
-                if(qgame){ // hvis qgame er true
-                    break; // break ud af spillet
-                }
+                    for (int i = 0; i < moves.Length; i+=4){ // hver move er 4 chars så længden af moves divideret med 4 er antal træk(derfor i incrementer med 4)
+                        Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3]; // putter hver muligt move ind i Cmoves char arrayet
+                        if (Tools.ArrC(Pmoves, Cmoves)){ // checker hvert move om spillerens move er ens med en af de mulige træk
+                            if(checkMove(bitboards, Pmoves, "white")){// checker om trækket for kongen til at blive i skak
+                                kingsafe = true; // sætter kingsafe til true
+                                int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // sætter start index ud fra trækket(minus '0' char konvertere char tallet til int automatisk)
+                                int end = (((Pmoves[2] - '0') * 8) + (Pmoves[3] - '0'));   // sætter slut index ud fra trækket(minus '0' char konvertere char tallet til int automatisk)
 
-                Wplay = Tools.algebra2Move(Wplay); // laver player inputtet til programmets interne koordinatsystem
-                /*
-                  Console.WriteLine(Wplay.Length);
-                  Console.WriteLine(Wplay);
-                  Console.WriteLine("play is");
-                  Console.ReadKey(true);
-                */
-                char[] Pmoves = new char[4]; // laver char array for at holde på trækket
-                char[] Cmoves = new char[4]; // laver char array for at holde på hvert muligt træk fundet af possibleMovesW
-                Pmoves[0] = Wplay[0]; Pmoves[1] = Wplay[1]; Pmoves[2] = Wplay[2]; Pmoves[3] = Wplay[3]; // putter hvert char i streng ind i char array
-                string moves; // streng der holder på alle mulige træk
-                moves = Moves.possibleMovesW(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside); // kalder metode der finder alle mulige træk
-                if( !AnyLegalMove(bitboards, moves, "white")){ // kalder metode der checker om der findes nogen træk
-                    blackwon = true; // sætter blackwon til true så korret meddelse kan printes efter break
-                    break; // breaker ud af program
-                }
-                for (int i = 0; i < moves.Length; i+=4){ // hver move er 4 chars så længden af moves divideret med 4 er antal træk(derfor i incrementer med 4)
-                    Cmoves[0] = moves[i]; Cmoves[1] = moves[i+1]; Cmoves[2] = moves[i+2]; Cmoves[3] = moves[i+3]; // putter hver muligt move ind i Cmoves char arrayet
-                    if (Tools.ArrC(Pmoves, Cmoves)){ // checker hvert move om spillerens move er ens med en af de mulige træk
-                        if(checkMove(bitboards, Pmoves, "white")){// checker om trækket for kongen til at blive i skak
-                            kingsafe = true; // sætter kingsafe til true
-                            int start = (((Pmoves[0] - '0') * 8) + (Pmoves[1] - '0')); // sætter start index ud fra trækket(minus '0' char konvertere char tallet til int automatisk)
-                            int end = (((Pmoves[2] - '0') * 8) + (Pmoves[3] - '0'));   // sætter slut index ud fra trækket(minus '0' char konvertere char tallet til int automatisk)
+                                if ((((UInt64)1 << start) & bitboards[6]) != 0) { // hvis hvid konge bevæger sig set kongerokademuligheder til false
+                                    castleWKside = false;
+                                    castleWQside = false;
+                                }
+                                if (((((UInt64)1 << start) & bitboards[8]) & ((UInt64)1 << 63)) != 0) { // hvis hvid tårn på index 63(højre) bevæger sig set kongesiden til false
+                                    castleWKside = false;
+                                }
+                                if (((((UInt64)1 << start) & bitboards[8]) & ((UInt64)1 << 56)) != 0) { // hvis dronnigside tårnet bevæger sig set hvid dronning kongerokade til false
+                                    castleWQside = false;
+                                }
 
-                            if ((((UInt64)1 << start) & bitboards[6]) != 0) { // hvis hvid konge bevæger sig set kongerokademuligheder til false
-                                castleWKside = false;
-                                castleWQside = false;
+                                // sender alle brikkers bitboard til makeMove metoden for at ændre deres bitboard afhængig af hvad trækket er
+                                EPB = Moves.makeMoveEP(bitboards[11]|bitboards[5], Cmoves, start); // sætter en passant masken EPB til den til den fil hvor en bonde bevæger sig 2 ranks op, ellers sætter den 0 så den kun masker en runde
+                                bitboards[8] = Moves.CastleMove(bitboards[8], bitboards[6], Cmoves, 'R', start); // checker om kongen bevæger sig 2 træk og sætter tårnets position ud fra det
+
+                                bitboards[0] = Moves.makeMove(bitboards[0], Cmoves, 'k', start, end);
+                                bitboards[1] = Moves.makeMove(bitboards[1], Cmoves, 'q', start, end);
+                                bitboards[2] = Moves.makeMove(bitboards[2], Cmoves, 'r', start, end);
+                                bitboards[3] = Moves.makeMove(bitboards[3], Cmoves, 'b', start, end);
+                                bitboards[4] = Moves.makeMove(bitboards[4], Cmoves, 'n', start, end);
+                                bitboards[5] = Moves.makeMove(bitboards[5], Cmoves, 'p', start, end);
+                                bitboards[6] = Moves.makeMove(bitboards[6], Cmoves, 'K', start, end);
+                                bitboards[7] = Moves.makeMove(bitboards[7], Cmoves, 'Q', start, end);
+                                bitboards[8] = Moves.makeMove(bitboards[8], Cmoves, 'R', start, end);
+                                bitboards[9] = Moves.makeMove(bitboards[9], Cmoves, 'B', start, end);
+                                bitboards[10] = Moves.makeMove(bitboards[10], Cmoves, 'N', start, end);
+                                bitboards[11] = Moves.makeMove(bitboards[11], Cmoves, 'P', start, end);
+
+                                break; // breaker ud af for loop da trækket blev fundet og resten af moves er ubetydelig
                             }
-                            if (((((UInt64)1 << start) & bitboards[8]) & ((UInt64)1 << 63)) != 0) { // hvis hvid tårn på index 63(højre) bevæger sig set kongesiden til false
-                                castleWKside = false;
-                            }
-                            if (((((UInt64)1 << start) & bitboards[8]) & ((UInt64)1 << 56)) != 0) { // hvis dronnigside tårnet bevæger sig set hvid dronning kongerokade til false
-                                castleWQside = false;
-                            }
-
-                            // sender alle brikkers bitboard til makeMove metoden for at ændre deres bitboard afhængig af hvad trækket er
-                            EPB = Moves.makeMoveEP(bitboards[11]|bitboards[5], Cmoves, start); // sætter en passant masken EPB til den til den fil hvor en bonde bevæger sig 2 ranks op, ellers sætter den 0 så den kun masker en runde
-                            bitboards[8] = Moves.CastleMove(bitboards[8], bitboards[6], Cmoves, 'R', start); // checker om kongen bevæger sig 2 træk og sætter tårnets position ud fra det
-
-                            bitboards[0] = Moves.makeMove(bitboards[0], Cmoves, 'k', start, end);
-                            bitboards[1] = Moves.makeMove(bitboards[1], Cmoves, 'q', start, end);
-                            bitboards[2] = Moves.makeMove(bitboards[2], Cmoves, 'r', start, end);
-                            bitboards[3] = Moves.makeMove(bitboards[3], Cmoves, 'b', start, end);
-                            bitboards[4] = Moves.makeMove(bitboards[4], Cmoves, 'n', start, end);
-                            bitboards[5] = Moves.makeMove(bitboards[5], Cmoves, 'p', start, end);
-                            bitboards[6] = Moves.makeMove(bitboards[6], Cmoves, 'K', start, end);
-                            bitboards[7] = Moves.makeMove(bitboards[7], Cmoves, 'Q', start, end);
-                            bitboards[8] = Moves.makeMove(bitboards[8], Cmoves, 'R', start, end);
-                            bitboards[9] = Moves.makeMove(bitboards[9], Cmoves, 'B', start, end);
-                            bitboards[10] = Moves.makeMove(bitboards[10], Cmoves, 'N', start, end);
-                            bitboards[11] = Moves.makeMove(bitboards[11], Cmoves, 'P', start, end);
-
-                            break; // breaker ud af for loop da trækket blev fundet og resten af moves er ubetydelig
                         }
                     }
-                }
 
-                // Det her er noget rod
-                if(!Tools.ArrC(Pmoves, Cmoves)){ // hvis trækket ikke er i Cmoves       continue while loop if invalid move or king check so not blacks turn
-                    if(!checkMove(bitboards, Pmoves, "white")){ // hvis trækket får kongen i check
-                        kingsafe = false; // sæt kingsafe false
-                        Console.Write("king is in check");
+                    // Det her er noget rod
+                    if(!Tools.ArrC(Pmoves, Cmoves)){ // hvis trækket ikke er i Cmoves       continue while loop if invalid move or king check so not blacks turn
+                        if(!checkMove(bitboards, Pmoves, "white")){ // hvis trækket får kongen i check
+                            kingsafe = false; // sæt kingsafe false
+                            Console.Write("king is in check");
+                            Console.ReadKey();
+                            continue; // continue loop så turen ikke går til sort/computer hvis trækket er invalid
+                        }
+                        Console.Write("move not found in valid moves"); // trækket er invalid
                         Console.ReadKey();
-                        continue; // continue loop så turen ikke går til sort/computer hvis trækket er invalid
+                        continue;// continue loop så turen ikke går til sort/computer hvis trækket er invalid
                     }
-                    Console.Write("move not found in valid moves"); // trækket er invalid
-                    Console.ReadKey();
-                    continue;// continue loop så turen ikke går til sort/computer hvis trækket er invalid
+                }else if(menuChoice == 'b'){
+                    // white computer starts here ///////////////
+                    Console.Clear(); // renser konsol vindue
+                    drawArray(bitboards); // kalder drawArray for at printe et skakbræt ud fra tilstanden af alle bitboards
+                    Console.WriteLine("Press or hold key to play moves");
+                    Console.WriteLine("'q' to exit");
+                    if(Console.ReadKey(true).KeyChar == 'q'){
+                        qgame = true;
+                        break;
+                    }
+                    moves = Moves.possibleMovesW(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside); // kalder possibleMovesB som finder alle mulige træk og sætter i strengen moves
+                    if( !AnyLegalMove(bitboards, moves, "white")){ // hvis computeren ikke har nogen lovlige træk break ud og sæt whitewon true
+                        blackwon = true;
+                        break;
+                    }
+
+                    do{// do while loop der prøver tilfælde træk indtil en der er valid
+
+                        int length = moves.Length/4; // hvor mange moves der er
+                        int randomMoveN = r.Next(0, length)*4; // tager random tal fra 0 til antal moves og ganger med 4 for at få start index på trækket
+                        Cmoves[0] = moves[randomMoveN]; Cmoves[1] = moves[randomMoveN+1]; Cmoves[2] = moves[randomMoveN+2]; Cmoves[3] = moves[randomMoveN+3]; // putter det random move ind i Cmoves arrayet
+
+                    }while(!checkMove(bitboards, Cmoves, "white")); // checker trækket
+
+
+                    //
+                    // det næste er næsten det samme som ved hvid spiller
+                    //
+
+                    int startpcW = (((Cmoves[0] - '0') * 8) + (Cmoves[1] - '0'));
+                    int endpcW = (((Cmoves[2] - '0') * 8) + (Cmoves[3] - '0'));
+
+                    if ((((UInt64)1 << startpcW) & bitboards[6]) != 0) { // hvis hvid konge bevæger sig set kongerokademuligheder til false
+                        castleWKside = false;
+                        castleWQside = false;
+                    }
+                    if (((((UInt64)1 << startpcW) & bitboards[8]) & ((UInt64)1 << 63)) != 0) { // hvis hvid tårn på index 63(højre) bevæger sig set kongesiden til false
+                        castleWKside = false;
+                    }
+                    if (((((UInt64)1 << startpcW) & bitboards[8]) & ((UInt64)1 << 56)) != 0) { // hvis dronnigside tårnet bevæger sig set hvid dronning kongerokade til false
+                        castleWQside = false;
+                    }
+
+
+                    EPB = Moves.makeMoveEP(bitboards[11]|bitboards[5], Cmoves, startpcW); // sætter en passant masken EPB til den til den fil hvor en bonde bevæger sig 2 ranks op, ellers sætter den 0 så den kun masker en runde
+                    bitboards[8] = Moves.CastleMove(bitboards[8], bitboards[6], Cmoves, 'R', startpcW); // checker om kongen bevæger sig 2 træk og sætter tårnets position ud fra det
+                    bitboards[0] = Moves.makeMove(bitboards[0], Cmoves, 'k', startpcW, endpcW);
+                    bitboards[1] = Moves.makeMove(bitboards[1], Cmoves, 'q', startpcW, endpcW);
+                    bitboards[2] = Moves.makeMove(bitboards[2], Cmoves, 'r', startpcW, endpcW);
+                    bitboards[3] = Moves.makeMove(bitboards[3], Cmoves, 'b', startpcW, endpcW);
+                    bitboards[4] = Moves.makeMove(bitboards[4], Cmoves, 'n', startpcW, endpcW);
+                    bitboards[5] = Moves.makeMove(bitboards[5], Cmoves, 'p', startpcW, endpcW);
+                    bitboards[6] = Moves.makeMove(bitboards[6], Cmoves, 'K', startpcW, endpcW);
+                    bitboards[7] = Moves.makeMove(bitboards[7], Cmoves, 'Q', startpcW, endpcW);
+                    bitboards[8] = Moves.makeMove(bitboards[8], Cmoves, 'R', startpcW, endpcW);
+                    bitboards[9] = Moves.makeMove(bitboards[9], Cmoves, 'B', startpcW, endpcW);
+                    bitboards[10] = Moves.makeMove(bitboards[10], Cmoves, 'N', startpcW, endpcW);
+                    bitboards[11] = Moves.makeMove(bitboards[11], Cmoves, 'P', startpcW, endpcW);
+
                 }
 
 
                 /////// BLACK COMPUTER STARTS HERE ///////////////////
+                Console.Clear(); // renser konsol vindue
+                drawArray(bitboards); // kalder drawArray for at printe et skakbræt ud fra tilstanden af alle bitboards
+                Console.WriteLine("Press or hold key to play moves");
+                Console.WriteLine("'q' to exit");
+                if(Console.ReadKey(true).KeyChar == 'q'){
+                    qgame = true;
+                    break;
+                }
                 moves = Moves.possibleMovesB(bitboards, EPB, castleWKside, castleWQside, castleBKside, castleBQside); // kalder possibleMovesB som finder alle mulige træk og sætter i strengen moves
                 if( !AnyLegalMove(bitboards, moves, "black")){ // hvis computeren ikke har nogen lovlige træk break ud og sæt whitewon true
                     whitewon = true;
                     break;
                 }
 
-                Random r = new Random(); // laver random object
                 do{// do while loop der prøver tilfælde træk indtil en der er valid
 
                     int length = moves.Length/4; // hvor mange moves der er
@@ -278,24 +350,62 @@ namespace ChessBitboard{
                 bitboards[8] = Moves.makeMove(bitboards[8], Cmoves, 'R', startpc, endpc);
                 bitboards[9] = Moves.makeMove(bitboards[9], Cmoves, 'B', startpc, endpc);
                 bitboards[10] = Moves.makeMove(bitboards[10], Cmoves, 'N', startpc, endpc);
+                bitboards[11] = Moves.makeMove(bitboards[11], Cmoves, 'P', startpc, endpc);
 
-
+                if(OnlyKings(bitboards)){
+                    draw = true;
+                    break;
+                }
 
             } // while loop slutter her
 
-            if(blackwon){ // hvis blackwon er true
-                Console.WriteLine("You lost against a stupid computer!");
-                Console.Read();
+            if(menuChoice == 'a'){
+                if(blackwon){ // hvis blackwon er true
+                    Console.WriteLine("You lost against a stupid computer!");
+                    Console.Read();
+                }else if(whitewon){ // hvis whitewon er true
+                    Console.WriteLine("You won against a stupid computer!");
+                    Console.Read();
+                }else if (qgame){ // hvis qgame er true
+                    Console.WriteLine("The game ended before a winner was found!");
+                    Console.Read();
+                }else if (draw){
+                    Console.WriteLine("Game is a draw!");
+                }
+            }else if(menuChoice == 'b'){
+                if(blackwon){ // hvis blackwon er true
+                    Console.WriteLine("Black won!");
+                    Console.Read();
+                }
+                else if(whitewon){ // hvis whitewon er true
+                    Console.WriteLine("White won!");
+                    Console.Read();
+                }
+                else if (qgame){ // hvis qgame er true
+                    Console.WriteLine("The game ended before a winner was found!");
+                    Console.Read();
+                }else if (draw){
+                    Console.WriteLine("Game is a draw!");
+                }
             }
-            else if(whitewon){ // hvis whitewon er true
-                Console.WriteLine("You won against a stupid computer!");
-                Console.Read();
+    } // initiatestdchess metode slutter her
+
+        public static bool OnlyKings(UInt64[] bitboards){
+            int count = 0;
+            UInt64 occupied =
+                bitboards[0]|bitboards[1]|bitboards[2]|bitboards[3]|bitboards[4]|bitboards[5]|
+                bitboards[6]|bitboards[7]|bitboards[8]|bitboards[9]|bitboards[10]|bitboards[11]; // or all pieces together to get occupied
+
+            for(int i = 0; i<64; i++){
+                if(((occupied >> i) & 1) == 1){
+                    count++;
+                }
             }
-            else if (qgame){ // hvis qgame er true
-                Console.WriteLine("The game ended before a winner was found!");
-                Console.Read();
+            if(count == 2){
+                return true;
             }
-        } // initiatestdchess metode slutter her
+            return false;
+        }
 
         public static void PrintHelp(){
             Console.WriteLine("To move a piece first select the piece with algebraic notation.");
